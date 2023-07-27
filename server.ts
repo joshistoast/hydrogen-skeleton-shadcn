@@ -14,6 +14,10 @@ import {
   type SessionStorage,
   type Session,
 } from '@shopify/remix-oxygen';
+import type {
+  LanguageCode,
+  CountryCode,
+} from '@shopify/hydrogen/storefront-api-types';
 
 /**
  * Export a fetch handler in module format.
@@ -44,7 +48,7 @@ export default {
       const {storefront} = createStorefrontClient({
         cache,
         waitUntil,
-        i18n: {language: 'EN', country: 'US'},
+        i18n: getLocaleFromRequest(request),
         publicStorefrontToken: env.PUBLIC_STOREFRONT_API_TOKEN,
         privateStorefrontToken: env.PRIVATE_STOREFRONT_API_TOKEN,
         storeDomain: env.PUBLIC_STORE_DOMAIN,
@@ -251,3 +255,24 @@ const CART_QUERY_FRAGMENT = `#graphql
     }
   }
 ` as const;
+
+export type I18nLocale = {language: LanguageCode; country: CountryCode};
+
+function getLocaleFromRequest(request: Request): I18nLocale {
+  const defaultLocale: I18nLocale = {language: 'EN', country: 'US'};
+  const supportedLocales = {
+    ES: 'ES',
+    FR: 'FR',
+    DE: 'DE',
+    JP: 'JA',
+  } as Record<CountryCode, LanguageCode>;
+
+  const url = new URL(request.url);
+  const firstSubdomain = url.hostname
+    .split('.')[0]
+    ?.toUpperCase() as keyof typeof supportedLocales;
+
+  return supportedLocales[firstSubdomain]
+    ? {language: supportedLocales[firstSubdomain], country: firstSubdomain}
+    : defaultLocale;
+}
