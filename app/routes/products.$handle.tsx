@@ -21,6 +21,7 @@ import {
 } from '@shopify/hydrogen';
 import type {CartLineInput} from '@shopify/hydrogen/storefront-api-types';
 import {getVariantUrl} from '~/utils';
+import { Icon } from '@iconify/react';
 
 export const meta: V2_MetaFunction = ({data}) => {
   return [{title: `Hydrogen | ${data.product.title}`}];
@@ -306,9 +307,10 @@ function AddToCartButton({
             onClick={onClick}
             disabled={disabled ?? fetcher.state !== 'idle'}
           >
-            {fetcher.state !== 'idle' && (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            )}
+            {fetcher.state !== 'idle'
+              ? (<Loader2 className="w-4 h-4 mr-2 animate-spin" />)
+              : (<Icon icon="lucide:plus" className="w-4 h-4 mr-2" />)
+            }
             {children}
           </Button>
         </>
