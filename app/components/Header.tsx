@@ -1,6 +1,21 @@
 import {Await, NavLink, useMatches} from '@remix-run/react';
 import {Suspense} from 'react';
 import type {LayoutProps} from './Layout';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuIndicator,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  NavigationMenuViewport,
+  navigationMenuTriggerStyle,
+} from "~/components/ui/navigation-menu"
+import { Icon } from '@iconify/react';
+import { SearchAside, MobileMenuAside, CartAside } from '~/components/Layout'
+import { Button } from './ui/button';
+
 
 type HeaderProps = Pick<LayoutProps, 'header' | 'cart' | 'isLoggedIn'>;
 
@@ -9,12 +24,14 @@ type Viewport = 'desktop' | 'mobile';
 export function Header({header, isLoggedIn, cart}: HeaderProps) {
   const {shop, menu} = header;
   return (
-    <header className="header">
-      <NavLink prefetch="intent" to="/" style={activeLinkStyle} end>
-        <strong>{shop.name}</strong>
-      </NavLink>
-      <HeaderMenu menu={menu} viewport="desktop" />
-      <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
+    <header className="z-[1] border-b">
+      <div className="container flex items-center px-4 py-2 mx-auto">
+        <NavLink prefetch="intent" to="/" end>
+          <strong>{shop.name}</strong>
+        </NavLink>
+        <HeaderMenu menu={menu} viewport="desktop" />
+        <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} header={header} />
+      </div>
     </header>
   );
 }
@@ -28,7 +45,6 @@ export function HeaderMenu({
 }) {
   const [root] = useMatches();
   const publicStoreDomain = root?.data?.publicStoreDomain;
-  const className = `header-menu-${viewport}`;
 
   function closeAside(event: React.MouseEvent<HTMLAnchorElement>) {
     if (viewport === 'mobile') {
@@ -38,18 +54,10 @@ export function HeaderMenu({
   }
 
   return (
-    <nav className={className} role="navigation">
-      {viewport === 'mobile' && (
-        <NavLink
-          end
-          onClick={closeAside}
-          prefetch="intent"
-          style={activeLinkStyle}
-          to="/"
-        >
-          Home
-        </NavLink>
-      )}
+    <nav
+      className={`gap-1 ${viewport === 'mobile' ? 'flex flex-col' : 'ml-3 hidden md:flex'}`}
+      role="navigation"
+    >
       {(menu || FALLBACK_HEADER_MENU).items.map((item) => {
         if (!item.url) return null;
 
@@ -61,12 +69,16 @@ export function HeaderMenu({
             : item.url;
         return (
           <NavLink
-            className="header-menu-item"
+            className={({ isActive, isPending }) => `
+              ${navigationMenuTriggerStyle()}
+              ${viewport === 'mobile' && '!w-full !justify-start'}
+              ${isActive && 'bg-accent/50'}
+              ${isPending && 'opacity-50'}
+            `}
             end
             key={item.id}
             onClick={closeAside}
             prefetch="intent"
-            style={activeLinkStyle}
             to={url}
           >
             {item.title}
@@ -80,11 +92,20 @@ export function HeaderMenu({
 function HeaderCtas({
   isLoggedIn,
   cart,
-}: Pick<HeaderProps, 'isLoggedIn' | 'cart'>) {
+  header,
+}: Pick<HeaderProps, 'isLoggedIn' | 'cart' | 'header'>) {
   return (
-    <nav className="header-ctas" role="navigation">
-      <HeaderMenuMobileToggle />
-      <NavLink prefetch="intent" to="/account" style={activeLinkStyle}>
+    <nav className="flex items-center gap-1 ml-auto" role="navigation">
+      <HeaderMenuMobileToggle header={header} />
+      <NavLink
+        className={({ isActive, isPending }) => `
+          ${navigationMenuTriggerStyle()}
+          ${isActive && 'bg-accent/50'}
+          ${isPending && 'opacity-50'}
+        `}
+        prefetch="intent"
+        to="/account"
+      >
         {isLoggedIn ? 'Account' : 'Sign in'}
       </NavLink>
       <SearchToggle />
@@ -93,29 +114,51 @@ function HeaderCtas({
   );
 }
 
-function HeaderMenuMobileToggle() {
+function HeaderMenuMobileToggle({
+  header,
+}: Pick<HeaderProps, 'header'>) {
+  const {menu} = header;
   return (
-    <a className="header-menu-mobile-toggle" href="#mobile-menu-aside">
-      <h3>☰</h3>
-    </a>
+    <MobileMenuAside menu={menu}>
+      <Button variant="ghost" className="md:hidden" size="icon">
+        <Icon icon="lucide:align-justify" className="w-4 h-4" />
+      </Button>
+    </MobileMenuAside>
   );
 }
 
 function SearchToggle() {
-  return <a href="#search-aside">Search</a>;
+  return (
+    <SearchAside>
+      <Button variant="ghost" size="icon">
+        <Icon icon="lucide:search" className="w-4 h-4" />
+      </Button>
+    </SearchAside>
+  );
 }
 
-function CartBadge({count}: {count: number}) {
-  return <a href="#cart-aside">Cart {count}</a>;
+type CartBadgeProps = {
+  count: number;
+  cart?: HeaderProps['cart'];
+}
+function CartBadge({count, cart}: CartBadgeProps) {
+  return (
+    <CartAside cart={cart}>
+      <Button variant="ghost">
+        <Icon icon="lucide:shopping-cart" className="w-4 h-4 mr-2" />
+        {count}
+      </Button>
+    </CartAside>
+  )
 }
 
 function CartToggle({cart}: Pick<HeaderProps, 'cart'>) {
   return (
-    <Suspense fallback={<CartBadge count={0} />}>
+    <Suspense fallback={<CartBadge count={0} cart={cart} />}>
       <Await resolve={cart}>
         {(cart) => {
           if (!cart) return <CartBadge count={0} />;
-          return <CartBadge count={cart.totalQuantity || 0} />;
+          return <CartBadge count={cart.totalQuantity || 0} cart={cart} />;
         }}
       </Await>
     </Suspense>
@@ -163,16 +206,3 @@ const FALLBACK_HEADER_MENU = {
     },
   ],
 };
-
-function activeLinkStyle({
-  isActive,
-  isPending,
-}: {
-  isActive: boolean;
-  isPending: boolean;
-}) {
-  return {
-    fontWeight: isActive ? 'bold' : '',
-    color: isPending ? 'grey' : 'black',
-  };
-}

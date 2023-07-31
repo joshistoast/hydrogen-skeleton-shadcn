@@ -13,6 +13,20 @@ import {
   PredictiveSearchForm,
   PredictiveSearchResults,
 } from '~/components/Search';
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "~/components/ui/sheet"
+import { CartSummary, CartCheckoutActions, CartDiscounts } from '~/components/Cart';
+import { Button } from '~/components/ui/button';
+import { Input } from '~/components/ui/input';
+import { Icon } from '@iconify/react';
 
 export type LayoutProps = {
   cart: Promise<CartApiQueryFragment | null>;
@@ -30,66 +44,116 @@ export function Layout({
   isLoggedIn,
 }: LayoutProps) {
   return (
-    <>
-      <CartAside cart={cart} />
-      <SearchAside />
-      <MobileMenuAside menu={header.menu} />
+    <div className="flex flex-col min-h-screen">
       <Header header={header} cart={cart} isLoggedIn={isLoggedIn} />
-      <main>{children}</main>
+      <main className="flex-1">
+        {children}
+      </main>
       <Suspense>
         <Await resolve={footer}>
           {(footer) => <Footer menu={footer.menu} />}
         </Await>
       </Suspense>
-    </>
+    </div>
   );
 }
 
-function CartAside({cart}: {cart: LayoutProps['cart']}) {
+type CartAsideProps = {
+  cart: LayoutProps['cart'];
+  children: React.ReactNode;
+}
+export function CartAside({cart, children}: CartAsideProps) {
   return (
-    <Aside id="cart-aside" heading="CART">
-      <Suspense fallback={<p>Loading cart ...</p>}>
-        <Await resolve={cart}>
-          {(cart) => {
-            return <CartMain cart={cart} layout="aside" />;
-          }}
-        </Await>
-      </Suspense>
-    </Aside>
+    <Sheet>
+      <SheetTrigger asChild>
+        {children}
+      </SheetTrigger>
+
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Cart</SheetTitle>
+          <SheetClose />
+        </SheetHeader>
+        <Suspense fallback={<p>Loading cart ...</p>}>
+          <Await resolve={cart}>
+            {(cart) => {
+              return (
+                <>
+                  <CartMain cart={cart} layout="aside" />
+                  {cart && (
+                    <SheetFooter>
+                      <CartSummary cost={cart.cost} layout="aside">
+                        <CartDiscounts discountCodes={cart.discountCodes} />
+                        <CartCheckoutActions checkoutUrl={cart.checkoutUrl} />
+                      </CartSummary>
+                    </SheetFooter>
+                  )}
+                </>
+              );
+            }}
+          </Await>
+        </Suspense>
+      </SheetContent>
+    </Sheet>
   );
 }
 
-function SearchAside() {
+type SearchAsideProps = {
+  children: React.ReactNode;
+}
+export function SearchAside({ children }: SearchAsideProps) {
   return (
-    <Aside id="search-aside" heading="SEARCH">
-      <div className="predictive-search">
-        <br />
+    <Sheet>
+      <SheetTrigger asChild>
+        {children}
+      </SheetTrigger>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Search</SheetTitle>
+        </SheetHeader>
+
         <PredictiveSearchForm>
           {({fetchResults, inputRef}) => (
-            <div>
-              <input
+            <div className="flex items-center gap-2 my-4">
+              <Input
                 name="q"
                 onChange={fetchResults}
                 onFocus={fetchResults}
                 placeholder="Search"
                 ref={inputRef}
                 type="search"
+                className="w-full"
               />
-              &nbsp;
-              <button type="submit">Search</button>
+              <Button type="submit" size="icon" className="shrink-0">
+                <Icon icon="lucide:search" className="w-4 h-4" />
+              </Button>
             </div>
           )}
         </PredictiveSearchForm>
         <PredictiveSearchResults />
-      </div>
-    </Aside>
+
+      </SheetContent>
+    </Sheet>
   );
 }
 
-function MobileMenuAside({menu}: {menu: HeaderQuery['menu']}) {
+type MobileMenuAsideProps = {
+  menu: HeaderQuery['menu'];
+  children: React.ReactNode;
+}
+export function MobileMenuAside({menu, children}: MobileMenuAsideProps) {
   return (
-    <Aside id="mobile-menu-aside" heading="MENU">
-      <HeaderMenu menu={menu} viewport="mobile" />
-    </Aside>
+    <Sheet>
+      <SheetTrigger asChild>
+        {children}
+      </SheetTrigger>
+
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Menu</SheetTitle>
+        </SheetHeader>
+        <HeaderMenu menu={menu} viewport="mobile" />
+      </SheetContent>
+    </Sheet>
   );
 }

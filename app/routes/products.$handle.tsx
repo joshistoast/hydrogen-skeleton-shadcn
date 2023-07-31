@@ -8,6 +8,8 @@ import type {
   ProductVariantsQuery,
   ProductVariantFragment,
 } from 'storefrontapi.generated';
+import { Button, buttonVariants } from '~/components/ui/button'
+import { Loader2 } from 'lucide-react'
 
 import {
   Image,
@@ -51,7 +53,7 @@ export async function loader({params, request, context}: LoaderArgs) {
   // all of them. But there might be a *lot*, so instead separate the variants
   // into it's own separate query that is deferred. So there's a brief moment
   // where variant options might show as available when they're not, but after
-  // this deffered query resolves, the UI will update.
+  // this deferred query resolves, the UI will update.
   const variants = storefront.query(VARIANTS_QUERY, {
     variables: {handle},
   });
@@ -106,7 +108,7 @@ export default function Product() {
   const {product, variants} = useLoaderData<typeof loader>();
   const {selectedVariant} = product;
   return (
-    <div className="product">
+    <div className="container grid p-4 mx-auto md:gap-16 md:grid-cols-2">
       <ProductImage image={selectedVariant?.image} />
       <ProductMain
         selectedVariant={selectedVariant}
@@ -253,20 +255,19 @@ function ProductOptions({option}: {option: VariantOption}) {
   return (
     <div className="product-options" key={option.name}>
       <h5>{option.name}</h5>
-      <div className="product-options-grid">
+      <div className="flex flex-wrap gap-3">
         {option.values.map(({value, isAvailable, isActive, to}) => {
           return (
             <Link
-              className="product-options-item"
+              // className="product-options-item"
+              className={
+                isActive ? buttonVariants({ variant: "secondary" }) : buttonVariants({ variant: "outline" })
+              }
               key={option.name + value}
               prefetch="intent"
               preventScrollReset
               replace
               to={to}
-              style={{
-                border: isActive ? '1px solid black' : '1px solid transparent',
-                opacity: isAvailable ? 1 : 0.3,
-              }}
             >
               {value}
             </Link>
@@ -300,13 +301,16 @@ function AddToCartButton({
             type="hidden"
             value={JSON.stringify(analytics)}
           />
-          <button
+          <Button
             type="submit"
             onClick={onClick}
             disabled={disabled ?? fetcher.state !== 'idle'}
           >
+            {fetcher.state !== 'idle' && (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            )}
             {children}
-          </button>
+          </Button>
         </>
       )}
     </CartForm>

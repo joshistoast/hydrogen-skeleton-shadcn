@@ -3,6 +3,9 @@ import type {CartLineUpdateInput} from '@shopify/hydrogen/storefront-api-types';
 import {Link} from '@remix-run/react';
 import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import {useVariantUrl} from '~/utils';
+import { Button, buttonVariants } from './ui/button'
+import { Icon } from '@iconify/react';
+import { Input } from './ui/input';
 
 type CartLine = CartApiQueryFragment['lines']['nodes'][0];
 
@@ -32,7 +35,7 @@ function CartDetails({layout, cart}: CartMainProps) {
   return (
     <div className="cart-details">
       <CartLines lines={cart?.lines} layout={layout} />
-      {cartHasItems && (
+      {cartHasItems && layout !== 'aside' && (
         <CartSummary cost={cart.cost} layout={layout}>
           <CartDiscounts discountCodes={cart.discountCodes} />
           <CartCheckoutActions checkoutUrl={cart.checkoutUrl} />
@@ -53,7 +56,7 @@ function CartLines({
 
   return (
     <div aria-labelledby="cart-lines">
-      <ul>
+      <ul className="m-0 list-none">
         {lines.nodes.map((line) => (
           <CartLineItem key={line.id} line={line} layout={layout} />
         ))}
@@ -102,7 +105,7 @@ function CartLineItem({
           </p>
         </Link>
         <CartLinePrice line={line} as="span" />
-        <ul>
+        <ul className="m-0 list-none">
           {selectedOptions.map((option) => (
             <li key={option.name}>
               <small>
@@ -117,12 +120,16 @@ function CartLineItem({
   );
 }
 
-function CartCheckoutActions({checkoutUrl}: {checkoutUrl: string}) {
+export function CartCheckoutActions({checkoutUrl}: {checkoutUrl: string}) {
   if (!checkoutUrl) return null;
 
   return (
     <div>
-      <a href={checkoutUrl} target="_self">
+      <a
+        href={checkoutUrl}
+        target="_self"
+        className={buttonVariants({ variant: "default", size: "lg" })}
+      >
         <p>Continue to Checkout &rarr;</p>
       </a>
       <br />
@@ -139,11 +146,11 @@ export function CartSummary({
   cost: CartApiQueryFragment['cost'];
   layout: CartMainProps['layout'];
 }) {
-  const className =
-    layout === 'page' ? 'cart-summary-page' : 'cart-summary-aside';
+  // const className =
+  //   layout === 'page' ? 'cart-summary-page' : 'cart-summary-aside';
 
   return (
-    <div aria-labelledby="cart-summary" className={className}>
+    <div aria-labelledby="cart-summary" className={`flex w-full flex-col gap-2`}>
       <h4>Totals</h4>
       <dl className="cart-subtotal">
         <dt>Subtotal</dt>
@@ -179,7 +186,7 @@ function CartLineQuantity({line}: {line: CartLine}) {
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
   return (
-    <div className="cart-line-quantiy">
+    <div className="cart-line-quantity">
       <small>Quantity: {quantity} &nbsp;&nbsp;</small>
       <CartLineUpdateButton lines={[{id: lineId, quantity: prevQuantity}]}>
         <button
@@ -256,14 +263,16 @@ export function CartEmpty({
             window.location.href = '/collections';
           }
         }}
+        className={buttonVariants({ variant: 'link' })}
       >
-        Continue shopping →
+        Continue shopping
+        <Icon icon="lucide:arrow-right" className="w-4 h-4 ml-2" />
       </Link>
     </div>
   );
 }
 
-function CartDiscounts({
+export function CartDiscounts({
   discountCodes,
 }: {
   discountCodes: CartApiQueryFragment['discountCodes'];
@@ -291,10 +300,11 @@ function CartDiscounts({
 
       {/* Show an input to apply a discount */}
       <UpdateDiscountForm discountCodes={codes}>
-        <div>
-          <input type="text" name="discountCode" placeholder="Discount code" />
-          &nbsp;
-          <button type="submit">Apply</button>
+        <div className="flex items-center gap-2">
+          <Input type="text" name="discountCode" placeholder="Discount code" />
+          <Button type="submit" size="icon" className="shrink-0">
+            <Icon icon="lucide:check" className="w-4 h-4" />
+          </Button>
         </div>
       </UpdateDiscountForm>
     </div>

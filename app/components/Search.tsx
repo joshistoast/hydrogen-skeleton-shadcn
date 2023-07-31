@@ -8,6 +8,7 @@ import {
 import {Image, Money, Pagination} from '@shopify/hydrogen';
 import React, {useRef, useEffect} from 'react';
 import {useFetchers} from '@remix-run/react';
+import { buttonVariants } from '~/components/ui/button';
 
 import type {
   PredictiveProductFragment,
@@ -15,6 +16,7 @@ import type {
   PredictiveArticleFragment,
   SearchQuery,
 } from 'storefrontapi.generated';
+import { Icon } from '@iconify/react';
 
 type PredicticeSearchResultItemImage =
   | PredictiveCollectionFragment['image']
@@ -320,11 +322,13 @@ export function PredictiveSearchResults() {
       </div>
       {/* view all results /search?q=term */}
       {searchTerm.current && (
-        <Link onClick={goToSearchResult} to={`/search?q=${searchTerm.current}`}>
-          <p>
-            View all results for <q>{searchTerm.current}</q>
-            &nbsp; →
-          </p>
+        <Link
+          className={buttonVariants({ variant: "link" })}
+          onClick={goToSearchResult}
+          to={`/search?q=${searchTerm.current}`}
+        >
+          View all results for <q>{searchTerm.current}</q>
+          <Icon icon="lucide:arrow-right" className="w-4 h-4 ml-2" />
         </Link>
       )}
     </div>
@@ -367,9 +371,9 @@ function PredictiveSearchResult({
   return (
     <div className="predictive-search-result" key={type}>
       <Link prefetch="intent" to={categoryUrl} onClick={goToSearchResult}>
-        <h5>{isSuggestions ? 'Suggestions' : type}</h5>
+        <h4 className="capitalize">{isSuggestions ? 'Suggestions' : type}</h4>
       </Link>
-      <ul>
+      <ul className="m-0 list-none">
         {items.map((item: NormalizedPredictiveSearchResultItem) => (
           <SearchResultItem
             goToSearchResult={goToSearchResult}
