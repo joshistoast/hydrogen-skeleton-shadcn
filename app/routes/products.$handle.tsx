@@ -309,7 +309,7 @@ function AddToCartButton({
           <Button
             type="submit"
             onClick={onClick}
-            disabled={disabled ?? fetcher.state !== 'idle'}
+            disabled={disabled || fetcher.state !== 'idle'}
           >
             {fetcher.state !== 'idle'
               ? (<Loader2 className="w-4 h-4 mr-2 animate-spin" />)
