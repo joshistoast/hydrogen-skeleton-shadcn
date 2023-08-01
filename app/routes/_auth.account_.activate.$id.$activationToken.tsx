@@ -1,6 +1,11 @@
 import type {ActionArgs, LoaderArgs} from '@shopify/remix-oxygen';
 import {json, redirect} from '@shopify/remix-oxygen';
 import {Form, useActionData, type V2_MetaFunction} from '@remix-run/react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
+import { Alert, AlertDescription } from '~/components/ui/alert';
+import { Label } from '~/components/ui/label';
+import { Input } from '~/components/ui/input';
+import { Button } from '~/components/ui/button';
 
 type ActionResponse = {
   error: string | null;
@@ -84,53 +89,52 @@ export default function Activate() {
   const error = action?.error ?? null;
 
   return (
-    <div className="account-activate">
-      <h1>Activate Account.</h1>
-      <p>Create your password to activate your account.</p>
-      <Form method="POST">
-        <fieldset>
-          <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            placeholder="Password"
-            aria-label="Password"
-            minLength={8}
-            required
-            // eslint-disable-next-line jsx-a11y/no-autofocus
-            autoFocus
-          />
-          <label htmlFor="passwordConfirm">Re-enter password</label>
-          <input
-            id="passwordConfirm"
-            name="passwordConfirm"
-            type="password"
-            autoComplete="current-password"
-            placeholder="Re-enter password"
-            aria-label="Re-enter password"
-            minLength={8}
-            required
-          />
-        </fieldset>
-        {error ? (
-          <p>
-            <mark>
-              <small>{error}</small>
-            </mark>
-          </p>
-        ) : (
-          <br />
-        )}
-        <button
-          className="bg-primary text-contrast rounded py-2 px-4 focus:shadow-outline block w-full"
-          type="submit"
-        >
-          Save
-        </button>
-      </Form>
-    </div>
+    <Card className='max-w-md'>
+      <CardHeader>
+        <CardTitle>Activate Account.</CardTitle>
+        <CardDescription>
+          Create your password to activate your account.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Form method="POST" className="flex flex-col gap-4">
+          <div>
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              autoComplete="current-password"
+              placeholder="Password"
+              aria-label="Password"
+              minLength={8}
+              required
+              // eslint-disable-next-line jsx-a11y/no-autofocus
+              autoFocus
+            />
+          </div>
+          <div>
+            <Label htmlFor="passwordConfirm">Re-enter password</Label>
+            <Input
+              id="passwordConfirm"
+              name="passwordConfirm"
+              type="password"
+              autoComplete="current-password"
+              placeholder="Re-enter password"
+              aria-label="Re-enter password"
+              minLength={8}
+              required
+            />
+          </div>
+          {error && (
+            <Alert variant='destructive'>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          <Button type="submit">Save</Button>
+        </Form>
+      </CardContent>
+    </Card>
   );
 }
 

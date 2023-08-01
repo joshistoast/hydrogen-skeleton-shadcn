@@ -25,7 +25,7 @@ export default function Blogs() {
   const {blogs} = useLoaderData<typeof loader>();
 
   return (
-    <div className="blogs">
+    <div className="container p-4 mx-auto">
       <h1>Blogs</h1>
       <div className="blogs-grid">
         <Pagination connection={blogs}>

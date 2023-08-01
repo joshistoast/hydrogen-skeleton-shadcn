@@ -16,14 +16,16 @@ export default function Policies() {
   const {policies} = useLoaderData<typeof loader>();
 
   return (
-    <div className="policies">
+    <div className="container flex flex-col gap-4 p-4 mx-auto">
       <h1>Policies</h1>
-      <div>
+      <div className="flex flex-col gap-2">
         {policies.map((policy) => {
           if (!policy) return null;
           return (
             <fieldset key={policy.id}>
-              <Link to={`/policies/${policy.handle}`}>{policy.title}</Link>
+              <Link to={`/policies/${policy.handle}`}>
+                <h2>{policy.title}</h2>
+              </Link>
             </fieldset>
           );
         })}

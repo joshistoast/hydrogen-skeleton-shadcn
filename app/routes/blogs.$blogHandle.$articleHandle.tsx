@@ -2,6 +2,7 @@ import type {V2_MetaFunction} from '@shopify/remix-oxygen';
 import {json, type LoaderArgs} from '@shopify/remix-oxygen';
 import {useLoaderData} from '@remix-run/react';
 import {Image} from '@shopify/hydrogen';
+import { Separator } from '~/components/ui/separator';
 
 export const meta: V2_MetaFunction = ({data}) => {
   return [{title: `Hydrogen | ${data.article.title} article`}];
@@ -38,18 +39,18 @@ export default function Article() {
   }).format(new Date(article.publishedAt));
 
   return (
-    <div className="article">
-      <h1>
-        {title}
-        <span>
-          {publishedDate} &middot; {author?.name}
-        </span>
-      </h1>
+    <div className="container flex flex-col gap-6 p-4 mx-auto">
+      <div className="flex flex-col gap-2">
+        <h1>{title}</h1>
+        <span>{publishedDate} &middot; {author?.name}</span>
+      </div>
+
+      <Separator />
 
       {image && <Image data={image} sizes="90vw" loading="eager" />}
       <div
         dangerouslySetInnerHTML={{__html: contentHtml}}
-        className="article"
+        className="prose-sm prose-neutral prose-invert"
       />
     </div>
   );

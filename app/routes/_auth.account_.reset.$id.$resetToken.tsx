@@ -1,5 +1,10 @@
 import {type ActionArgs, json, redirect} from '@shopify/remix-oxygen';
-import {Form, useActionData, type V2_MetaFunction} from '@remix-run/react';
+import {Form, Link, useActionData, type V2_MetaFunction} from '@remix-run/react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '~/components/ui/card';
+import { Label } from '~/components/ui/label';
+import { Input } from '~/components/ui/input';
+import { Alert, AlertDescription } from '~/components/ui/alert';
+import { Button, buttonVariants } from '~/components/ui/button';
 
 type ActionResponse = {
   error: string | null;
@@ -64,52 +69,56 @@ export default function Reset() {
   const action = useActionData<ActionResponse>();
 
   return (
-    <div className="account-reset">
-      <h1>Reset Password.</h1>
-      <p>Enter a new password for your account.</p>
-      <Form method="POST">
-        <fieldset>
-          <label htmlFor="password">Password</label>
-          <input
-            aria-label="Password"
-            autoComplete="current-password"
-            // eslint-disable-next-line jsx-a11y/no-autofocus
-            autoFocus
-            id="password"
-            minLength={8}
-            name="password"
-            placeholder="Password"
-            required
-            type="password"
-          />
-          <label htmlFor="passwordConfirm">Re-enter password</label>
-          <input
-            aria-label="Re-enter password"
-            autoComplete="current-password"
-            id="passwordConfirm"
-            minLength={8}
-            name="passwordConfirm"
-            placeholder="Re-enter password"
-            required
-            type="password"
-          />
-        </fieldset>
-        {action?.error ? (
-          <p>
-            <mark>
-              <small>{action.error}</small>
-            </mark>
-          </p>
-        ) : (
-          <br />
-        )}
-        <button type="submit">Reset</button>
-      </Form>
-      <br />
-      <p>
-        <a href="/account/login">Back to login →</a>
-      </p>
-    </div>
+    <Card className='max-w-md'>
+      <CardHeader>
+        <CardTitle>Reset Password.</CardTitle>
+        <CardDescription>
+          Enter a new password for your account.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Form method="POST" className="flex flex-col gap-4">
+          <div>
+            <Label htmlFor="password">Password</Label>
+            <Input
+              aria-label="Password"
+              autoComplete="current-password"
+              // eslint-disable-next-line jsx-a11y/no-autofocus
+              autoFocus
+              id="password"
+              minLength={8}
+              name="password"
+              placeholder="Password"
+              required
+              type="password"
+            />
+          </div>
+          <div>
+            <Label htmlFor="passwordConfirm">Re-enter password</Label>
+            <Input
+              aria-label="Re-enter password"
+              autoComplete="current-password"
+              id="passwordConfirm"
+              minLength={8}
+              name="passwordConfirm"
+              placeholder="Re-enter password"
+              required
+              type="password"
+            />
+          </div>
+          {action?.error && (
+            <Alert variant="destructive">
+              <AlertDescription>{action.error}</AlertDescription>
+            </Alert>
+          )}
+          <Button type="submit">Reset</Button>
+        </Form>
+      </CardContent>
+
+      <CardFooter className="flex flex-wrap gap-4">
+        <Link className={buttonVariants({ variant: 'link' })} to="/account/login">Login →</Link>
+      </CardFooter>
+    </Card>
   );
 }
 

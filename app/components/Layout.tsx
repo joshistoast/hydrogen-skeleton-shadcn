@@ -27,6 +27,7 @@ import { CartSummary, CartCheckoutActions, CartDiscounts } from '~/components/Ca
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Icon } from '@iconify/react';
+import React from 'react';
 
 export type LayoutProps = {
   cart: Promise<CartApiQueryFragment | null>;
@@ -69,7 +70,7 @@ export function CartAside({cart, children}: CartAsideProps) {
         {children}
       </SheetTrigger>
 
-      <SheetContent>
+      <SheetContent className="flex flex-col">
         <SheetHeader>
           <SheetTitle>Cart</SheetTitle>
           <SheetClose />
@@ -81,7 +82,7 @@ export function CartAside({cart, children}: CartAsideProps) {
                 <>
                   <CartMain cart={cart} layout="aside" />
                   {cart && (
-                    <SheetFooter>
+                    <SheetFooter className="mt-auto">
                       <CartSummary cost={cart.cost} layout="aside">
                         <CartDiscounts discountCodes={cart.discountCodes} />
                         <CartCheckoutActions checkoutUrl={cart.checkoutUrl} />
@@ -142,17 +143,21 @@ type MobileMenuAsideProps = {
   children: React.ReactNode;
 }
 export function MobileMenuAside({menu, children}: MobileMenuAsideProps) {
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
+
   return (
-    <Sheet>
+    <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
       <SheetTrigger asChild>
         {children}
       </SheetTrigger>
 
-      <SheetContent>
+      <SheetContent side="left">
         <SheetHeader>
           <SheetTitle>Menu</SheetTitle>
         </SheetHeader>
-        <HeaderMenu menu={menu} viewport="mobile" />
+        <div className="py-2">
+          <HeaderMenu menu={menu} viewport="mobile" onNavLinkClick={() => setMobileMenuOpen(false)} />
+        </div>
       </SheetContent>
     </Sheet>
   );

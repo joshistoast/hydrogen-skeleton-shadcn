@@ -19,7 +19,7 @@ export default function Collections() {
   const {collections} = useLoaderData<typeof loader>();
 
   return (
-    <div className="collections">
+    <div className="container p-4 mx-auto">
       <h1>Collections</h1>
       <Pagination connection={collections}>
         {({nodes, isLoading, PreviousLink, NextLink}) => (

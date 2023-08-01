@@ -1,5 +1,10 @@
 import {json, redirect, type LoaderArgs} from '@shopify/remix-oxygen';
 import {Form, Link, useActionData} from '@remix-run/react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '~/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert';
+import { Button, buttonVariants } from '~/components/ui/button';
+import { Input } from '~/components/ui/input';
+import { Label } from '~/components/ui/label';
 
 type ActionResponse = {
   error?: string;
@@ -46,63 +51,57 @@ export default function Recover() {
   const action = useActionData<ActionResponse>();
 
   return (
-    <div className="account-recover">
-      <div>
+    <Card className='max-w-md'>
+      <CardHeader>
+        <CardTitle>Forgot Password.</CardTitle>
+        <CardDescription>
+          Enter the email address associated with your account to receive a
+          link to reset your password.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
         {action?.resetRequested ? (
           <>
-            <h1>Request Sent.</h1>
-            <p>
-              If that email address is in our system, you will receive an email
-              with instructions about how to reset your password in a few
-              minutes.
-            </p>
-            <br />
+            <Alert>
+              <AlertTitle>Request Sent</AlertTitle>
+              <AlertDescription>
+                If that email address is in our system, you will receive an email
+                with instructions about how to reset your password in a few
+                minutes.
+              </AlertDescription>
+            </Alert>
             <Link to="/account/login">Return to Login</Link>
           </>
         ) : (
           <>
-            <h1>Forgot Password.</h1>
-            <p>
-              Enter the email address associated with your account to receive a
-              link to reset your password.
-            </p>
-            <br />
-            <Form method="POST">
-              <fieldset>
-                <label htmlFor="email">Email</label>
-                <input
-                  aria-label="Email address"
-                  autoComplete="email"
-                  // eslint-disable-next-line jsx-a11y/no-autofocus
-                  autoFocus
+            <Form method="POST" className="flex flex-col gap-4">
+              <div>
+                <Label htmlFor="email">Email address</Label>
+                <Input
                   id="email"
                   name="email"
-                  placeholder="Email address"
-                  required
                   type="email"
+                  autoComplete="email"
+                  required
+                  placeholder="Email address"
+                  aria-label="Email address"
+                  autoFocus
                 />
-              </fieldset>
-              {action?.error ? (
-                <p>
-                  <mark>
-                    <small>{action.error}</small>
-                  </mark>
-                </p>
-              ) : (
-                <br />
+              </div>
+              {action?.error && (
+                <Alert variant='destructive'>
+                  <AlertDescription>{action.error}</AlertDescription>
+                </Alert>
               )}
-              <button type="submit">Request Reset Link</button>
+              <Button type="submit">Request Reset Link</Button>
             </Form>
-            <div>
-              <br />
-              <p>
-                <Link to="/account/login">Login →</Link>
-              </p>
-            </div>
           </>
         )}
-      </div>
-    </div>
+      </CardContent>
+      <CardFooter className="flex flex-wrap gap-4">
+        <Link className={buttonVariants({ variant: 'link' })} to="/account/login">Login →</Link>
+      </CardFooter>
+    </Card>
   );
 }
 

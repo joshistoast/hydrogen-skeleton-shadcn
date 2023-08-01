@@ -19,6 +19,7 @@ import resetStyles from './styles/reset.css';
 import appStyles from './styles/app.css';
 import {Layout} from '~/components/Layout';
 import tailwindCss from './styles/tailwind.css';
+import { ThemeProvider } from '~/components/ThemeContext';
 
 export function links() {
   return [
@@ -91,9 +92,11 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <Layout {...data}>
-          <Outlet />
-        </Layout>
+        <ThemeProvider>
+          <Layout {...data}>
+            <Outlet />
+          </Layout>
+        </ThemeProvider>
         <ScrollRestoration />
         <Scripts />
       </body>

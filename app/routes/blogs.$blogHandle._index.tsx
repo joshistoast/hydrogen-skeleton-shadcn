@@ -3,6 +3,8 @@ import {json, type LoaderArgs} from '@shopify/remix-oxygen';
 import {Link, useLoaderData} from '@remix-run/react';
 import {Image, Pagination, getPaginationVariables} from '@shopify/hydrogen';
 import type {ArticleItemFragment} from 'storefrontapi.generated';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '~/components/ui/card';
+import { Button, buttonVariants } from '~/components/ui/button';
 
 export const meta: V2_MetaFunction = ({data}) => {
   return [{title: `Hydrogen | ${data.blog.title} blog`}];
@@ -40,32 +42,36 @@ export default function Blog() {
   const {articles} = blog;
 
   return (
-    <div className="blog">
-      <h1>{blog.title}</h1>
-      <div className="blog-grid">
-        <Pagination connection={articles}>
-          {({nodes, isLoading, PreviousLink, NextLink}) => {
-            return (
-              <>
-                <PreviousLink>
-                  {isLoading ? 'Loading...' : <span>↑ Load previous</span>}
-                </PreviousLink>
-                {nodes.map((article, index) => {
-                  return (
-                    <ArticleItem
-                      article={article}
-                      key={article.id}
-                      loading={index < 2 ? 'eager' : 'lazy'}
-                    />
-                  );
-                })}
-                <NextLink>
-                  {isLoading ? 'Loading...' : <span>Load more ↓</span>}
-                </NextLink>
-              </>
-            );
-          }}
-        </Pagination>
+    <div className="container p-4 mx-auto">
+      <div className="flex flex-col gap-6">
+        <h1>{blog.title}</h1>
+        <div className="blog-grid">
+          <Pagination connection={articles}>
+            {({nodes, isLoading, PreviousLink, NextLink}) => {
+              return (
+                <>
+                  <PreviousLink>
+                    {isLoading ? 'Loading...' : <span>↑ Load previous</span>}
+                  </PreviousLink>
+
+                  {nodes.map((article, index) => {
+                    return (
+                      <ArticleItem
+                        article={article}
+                        key={article.id}
+                        loading={index < 2 ? 'eager' : 'lazy'}
+                      />
+                    );
+                  })}
+
+                  <NextLink>
+                    {isLoading ? 'Loading...' : <span>Load more ↓</span>}
+                  </NextLink>
+                </>
+              );
+            }}
+          </Pagination>
+        </div>
       </div>
     </div>
   );
@@ -84,8 +90,8 @@ function ArticleItem({
     day: 'numeric',
   }).format(new Date(article.publishedAt!));
   return (
-    <div className="blog-article" key={article.id}>
-      <Link to={`/blogs/${article.blog.handle}/${article.handle}`}>
+    <Card key={article.id}>
+      <CardContent className="p-6">
         {article.image && (
           <div className="blog-article-image">
             <Image
@@ -99,8 +105,13 @@ function ArticleItem({
         )}
         <h3>{article.title}</h3>
         <small>{publishedAt}</small>
-      </Link>
-    </div>
+      </CardContent>
+      <CardFooter>
+        <Link className={buttonVariants()} to={`/blogs/${article.blog.handle}/${article.handle}`}>
+          Read more
+        </Link>
+      </CardFooter>
+    </Card>
   );
 }
 

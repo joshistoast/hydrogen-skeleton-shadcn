@@ -9,6 +9,8 @@ import {
 } from '@shopify/hydrogen';
 import type {ProductItemFragment} from 'storefrontapi.generated';
 import {useVariantUrl} from '~/utils';
+import { buttonVariants } from '~/components/ui/button';
+import { Icon } from '@iconify/react';
 
 export const meta: V2_MetaFunction = ({data}) => {
   return [{title: `Hydrogen | ${data.collection.title} Collection`}];
@@ -41,20 +43,43 @@ export default function Collection() {
   const {collection} = useLoaderData<typeof loader>();
 
   return (
-    <div className="collection">
+    <div className="container p-4 mx-auto">
       <h1>{collection.title}</h1>
       <p className="collection-description">{collection.description}</p>
       <Pagination connection={collection.products}>
         {({nodes, isLoading, PreviousLink, NextLink}) => (
           <>
-            <PreviousLink>
-              {isLoading ? 'Loading...' : <span>↑ Load previous</span>}
-            </PreviousLink>
+            <div className="flex justify-center w-full">
+              <PreviousLink className={buttonVariants({ variant: 'default' })}>
+                {isLoading
+                  ? (<>
+                    <Icon icon="lucide:loader-2" className="w-4 h-4 mr-2 animate-spin" />
+                    <span>Loading previous...</span>
+                  </>)
+                  : (<>
+                    <Icon icon="lucide:arrow-up" className="w-4 h-4 mr-2" />
+                    <span>Load previous</span>
+                  </>)
+                }
+              </PreviousLink>
+            </div>
+
             <ProductsGrid products={nodes} />
-            <br />
-            <NextLink>
-              {isLoading ? 'Loading...' : <span>Load more ↓</span>}
-            </NextLink>
+
+            <div className="flex justify-center w-full">
+              <NextLink className={buttonVariants({ variant: 'default' })}>
+                {isLoading
+                  ? (<>
+                    <Icon icon="lucide:loader-2" className="w-4 h-4 mr-2 animate-spin" />
+                    <span>Loading more...</span>
+                  </>)
+                  : (<>
+                    <Icon icon="lucide:arrow-down" className="w-4 h-4 mr-2" />
+                    <span>Load more</span>
+                  </>)
+                }
+              </NextLink>
+            </div>
           </>
         )}
       </Pagination>

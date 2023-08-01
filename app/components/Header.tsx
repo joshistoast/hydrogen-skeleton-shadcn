@@ -25,7 +25,8 @@ export function Header({header, isLoggedIn, cart}: HeaderProps) {
   const {shop, menu} = header;
   return (
     <header className="z-[1] border-b">
-      <div className="container flex items-center px-4 py-2 mx-auto">
+      <div className="container flex items-center gap-2 px-4 py-2 mx-auto">
+        <HeaderMenuMobileToggle header={header} />
         <NavLink prefetch="intent" to="/" end>
           <strong>{shop.name}</strong>
         </NavLink>
@@ -36,22 +37,18 @@ export function Header({header, isLoggedIn, cart}: HeaderProps) {
   );
 }
 
+type HeaderMenuProps = {
+  menu: HeaderProps['header']['menu'];
+  viewport: Viewport;
+  onNavLinkClick?: () => void;
+}
 export function HeaderMenu({
   menu,
   viewport,
-}: {
-  menu: HeaderProps['header']['menu'];
-  viewport: Viewport;
-}) {
+  onNavLinkClick,
+}: HeaderMenuProps) {
   const [root] = useMatches();
   const publicStoreDomain = root?.data?.publicStoreDomain;
-
-  function closeAside(event: React.MouseEvent<HTMLAnchorElement>) {
-    if (viewport === 'mobile') {
-      event.preventDefault();
-      window.location.href = event.currentTarget.href;
-    }
-  }
 
   return (
     <nav
@@ -72,12 +69,12 @@ export function HeaderMenu({
             className={({ isActive, isPending }) => `
               ${navigationMenuTriggerStyle()}
               ${viewport === 'mobile' && '!w-full !justify-start'}
-              ${isActive && 'bg-accent/50'}
-              ${isPending && 'opacity-50'}
+              ${isActive && 'bg-accent'}
+              ${isPending && 'animate-pulse'}
             `}
             end
+            onClick={onNavLinkClick}
             key={item.id}
-            onClick={closeAside}
             prefetch="intent"
             to={url}
           >
@@ -96,16 +93,16 @@ function HeaderCtas({
 }: Pick<HeaderProps, 'isLoggedIn' | 'cart' | 'header'>) {
   return (
     <nav className="flex items-center gap-1 ml-auto" role="navigation">
-      <HeaderMenuMobileToggle header={header} />
       <NavLink
         className={({ isActive, isPending }) => `
           ${navigationMenuTriggerStyle()}
-          ${isActive && 'bg-accent/50'}
-          ${isPending && 'opacity-50'}
+          ${isActive && 'bg-accent'}
+          ${isPending && 'animate-pulse'}
         `}
         prefetch="intent"
         to="/account"
       >
+        <Icon icon="lucide:user" className="w-4 h-4 mr-2" />
         {isLoggedIn ? 'Account' : 'Sign in'}
       </NavLink>
       <SearchToggle />

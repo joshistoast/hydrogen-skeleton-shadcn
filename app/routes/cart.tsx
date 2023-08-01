@@ -90,7 +90,7 @@ export default function Cart() {
   const cart = root.data?.cart as Promise<CartApiQueryFragment | null>;
 
   return (
-    <div className="cart">
+    <div className="container flex flex-col gap-4 p-4 mx-auto">
       <h1>Cart</h1>
       <Suspense fallback={<p>Loading cart ...</p>}>
         <Await errorElement={<div>An error occurred</div>} resolve={cart}>

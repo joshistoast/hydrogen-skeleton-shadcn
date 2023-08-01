@@ -6,6 +6,11 @@ import {
 } from '@shopify/remix-oxygen';
 import {Form, Link, useActionData} from '@remix-run/react';
 import type {CustomerCreateMutation} from 'storefrontapi.generated';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '~/components/ui/card';
+import { Label } from '~/components/ui/label';
+import { Input } from '~/components/ui/input';
+import { Button, buttonVariants } from '~/components/ui/button';
+import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert';
 
 type ActionResponse = {
   error: string | null;
@@ -107,61 +112,67 @@ export default function Register() {
   const data = useActionData<ActionResponse>();
   const error = data?.error || null;
   return (
-    <div className="login">
-      <h1>Register.</h1>
-      <Form method="POST">
-        <fieldset>
-          <label htmlFor="email">Email address</label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            required
-            placeholder="Email address"
-            aria-label="Email address"
-            // eslint-disable-next-line jsx-a11y/no-autofocus
-            autoFocus
-          />
-          <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            placeholder="Password"
-            aria-label="Password"
-            minLength={8}
-            required
-          />
-          <label htmlFor="passwordConfirm">Re-enter password</label>
-          <input
-            id="passwordConfirm"
-            name="passwordConfirm"
-            type="password"
-            autoComplete="current-password"
-            placeholder="Re-enter password"
-            aria-label="Re-enter password"
-            minLength={8}
-            required
-          />
-        </fieldset>
-        {error ? (
-          <p>
-            <mark>
-              <small>{error}</small>
-            </mark>
-          </p>
-        ) : (
-          <br />
-        )}
-        <button type="submit">Register</button>
-      </Form>
-      <br />
-      <p>
-        <Link to="/account/login">Login →</Link>
-      </p>
-    </div>
+    <Card className="max-w-md">
+      <CardHeader>
+        <CardTitle>Register.</CardTitle>
+        <CardDescription>
+          Register for an account to access your order history and update your account details.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Form method="POST" className="flex flex-col gap-4">
+          <div>
+            <Label htmlFor="email">Email address</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              placeholder="Email address"
+              aria-label="Email address"
+              autoFocus
+            />
+          </div>
+          <div>
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              autoComplete="current-password"
+              required
+              placeholder="Password"
+              aria-label="Password"
+              autoFocus
+            />
+          </div>
+          <div>
+            <Label htmlFor='passwordConfirm'>Re-enter password</Label>
+            <Input
+              id="passwordConfirm"
+              name="passwordConfirm"
+              type="password"
+              autoComplete="current-password"
+              placeholder="Re-enter password"
+              aria-label="Re-enter password"
+              minLength={8}
+              required
+            />
+          </div>
+          {error && (
+            <Alert variant="destructive">
+              <AlertTitle>Registration Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          <Button type="submit">Register</Button>
+        </Form>
+      </CardContent>
+      <CardFooter className="flex flex-wrap gap-4">
+        <Link className={buttonVariants({ variant: 'link' })} to="/account/login">Login →</Link>
+      </CardFooter>
+    </Card>
   );
 }
 

@@ -10,6 +10,7 @@ import type {
   CustomerOrdersFragment,
   OrderItemFragment,
 } from 'storefrontapi.generated';
+import { buttonVariants } from '~/components/ui/button';
 
 export const meta: V2_MetaFunction = () => {
   return [{title: 'Orders'}];
@@ -99,7 +100,7 @@ function EmptyOrders() {
       <p>You haven&apos;t placed any orders yet.</p>
       <br />
       <p>
-        <Link to="/collections">Start Shopping →</Link>
+        <Link className={buttonVariants({ variant: 'link' })} to="/collections">Start Shopping →</Link>
       </p>
     </div>
   );

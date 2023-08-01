@@ -232,9 +232,6 @@ function ProductForm({
       <br />
       <AddToCartButton
         disabled={!selectedVariant || !selectedVariant.availableForSale}
-        onClick={() => {
-          window.location.href = window.location.href + '#cart-aside';
-        }}
         lines={
           selectedVariant
             ? [
@@ -254,16 +251,23 @@ function ProductForm({
 
 function ProductOptions({option}: {option: VariantOption}) {
   return (
-    <div className="product-options" key={option.name}>
-      <h5>{option.name}</h5>
+    <div className="flex flex-col gap-2" key={option.name}>
+      <h5 className="flex items-center gap-1">
+        {option.name}:
+        {option.values.find((value) => value.isActive) && (
+          <span className="text-muted-foreground">
+            {option.values.find((value) => value.isActive)?.value}
+          </span>
+        )}
+      </h5>
       <div className="flex flex-wrap gap-3">
         {option.values.map(({value, isAvailable, isActive, to}) => {
           return (
             <Link
-              // className="product-options-item"
-              className={
-                isActive ? buttonVariants({ variant: "secondary" }) : buttonVariants({ variant: "outline" })
-              }
+              aria-disabled={!isAvailable}
+              className={`
+                ${isActive ? buttonVariants({ variant: "secondary" }) : buttonVariants({ variant: "outline" })}
+              `}
               key={option.name + value}
               prefetch="intent"
               preventScrollReset

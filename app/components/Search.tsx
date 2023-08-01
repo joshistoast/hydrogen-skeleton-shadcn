@@ -153,7 +153,7 @@ export function SearchResults({
 function SearchResultsProductsGrid({products}: Pick<SearchQuery, 'products'>) {
   return (
     <div className="search-result">
-      <h3>Products</h3>
+      <h4>Products</h4>
       <Pagination connection={products}>
         {({nodes, isLoading, NextLink, PreviousLink}) => {
           const itemsMarkup = nodes.map((product) => (
@@ -191,7 +191,7 @@ function SearchResultsProductsGrid({products}: Pick<SearchQuery, 'products'>) {
 function SearchResultPageGrid({pages}: Pick<SearchQuery, 'pages'>) {
   return (
     <div className="search-result">
-      <h2>Pages</h2>
+      <h3>Pages</h3>
       <div>
         {pages?.nodes?.map((page) => (
           <div className="search-results-item" key={page.id}>
@@ -209,7 +209,7 @@ function SearchResultPageGrid({pages}: Pick<SearchQuery, 'pages'>) {
 function SearchResultArticleGrid({articles}: Pick<SearchQuery, 'articles'>) {
   return (
     <div className="search-result">
-      <h2>Articles</h2>
+      <h3>Articles</h3>
       <div>
         {articles?.nodes?.map((article) => (
           <div className="search-results-item" key={article.id}>
@@ -371,7 +371,7 @@ function PredictiveSearchResult({
   return (
     <div className="predictive-search-result" key={type}>
       <Link prefetch="intent" to={categoryUrl} onClick={goToSearchResult}>
-        <h4 className="capitalize">{isSuggestions ? 'Suggestions' : type}</h4>
+        <h3 className="capitalize">{isSuggestions ? 'Suggestions' : type}</h3>
       </Link>
       <ul className="m-0 list-none">
         {items.map((item: NormalizedPredictiveSearchResultItem) => (

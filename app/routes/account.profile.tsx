@@ -8,6 +8,11 @@ import {
   useNavigation,
   useOutletContext,
 } from '@remix-run/react';
+import { Label } from '~/components/ui/label';
+import { Input } from '~/components/ui/input';
+import { Checkbox } from '~/components/ui/checkbox';
+import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert';
+import { Button } from '~/components/ui/button';
 
 export type ActionResponse = {
   error: string | null;
@@ -112,11 +117,15 @@ export default function AccountProfile() {
     <div className="account-profile">
       <h2>My profile</h2>
       <br />
-      <Form method="PUT">
-        <legend>Personal information</legend>
-        <fieldset>
-          <label htmlFor="firstName">First name</label>
-          <input
+      <Form method="PUT" className="flex flex-col gap-3">
+
+        <div>
+          <h3>Personal Information</h3>
+        </div>
+
+        <div className="space-y-1">
+          <Label htmlFor="firstName">First name</Label>
+          <Input
             id="firstName"
             name="firstName"
             type="text"
@@ -126,8 +135,11 @@ export default function AccountProfile() {
             defaultValue={customer.firstName ?? ''}
             minLength={2}
           />
-          <label htmlFor="lastName">Last name</label>
-          <input
+        </div>
+
+        <div className="space-y-1">
+          <Label htmlFor="lastName">Last name</Label>
+          <Input
             id="lastName"
             name="lastName"
             type="text"
@@ -137,8 +149,11 @@ export default function AccountProfile() {
             defaultValue={customer.lastName ?? ''}
             minLength={2}
           />
-          <label htmlFor="phone">Mobile</label>
-          <input
+        </div>
+
+        <div className="space-y-1">
+          <Label htmlFor="phone">Mobile</Label>
+          <Input
             id="phone"
             name="phone"
             type="tel"
@@ -147,8 +162,11 @@ export default function AccountProfile() {
             aria-label="Mobile"
             defaultValue={customer.phone ?? ''}
           />
-          <label htmlFor="email">Email address</label>
-          <input
+        </div>
+
+        <div className="space-y-1">
+          <Label htmlFor="email">Email address</Label>
+          <Input
             id="email"
             name="email"
             type="email"
@@ -158,25 +176,25 @@ export default function AccountProfile() {
             aria-label="Email address"
             defaultValue={customer.email ?? ''}
           />
-          <div className="account-profile-marketing">
-            <input
-              id="acceptsMarketing"
-              name="acceptsMarketing"
-              type="checkbox"
-              placeholder="Accept marketing"
-              aria-label="Accept marketing"
-              defaultChecked={customer.acceptsMarketing}
-            />
-            <label htmlFor="acceptsMarketing">
-              &nbsp; Subscribed to marketing communications
-            </label>
-          </div>
-        </fieldset>
-        <br />
-        <legend>Change password (optional)</legend>
-        <fieldset>
-          <label htmlFor="currentPassword">Current password</label>
-          <input
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Checkbox id="acceptsMarketing" />
+          <label
+            htmlFor="acceptsMarketing"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            Subscribed to marketing communications
+          </label>
+        </div>
+
+        <div className="mt-4">
+          <h3>Change password (optional)</h3>
+        </div>
+
+        <div className="space-y-1">
+          <Label htmlFor="currentPassword">Current password</Label>
+          <Input
             id="currentPassword"
             name="currentPassword"
             type="password"
@@ -185,9 +203,11 @@ export default function AccountProfile() {
             aria-label="Current password"
             minLength={8}
           />
+        </div>
 
-          <label htmlFor="newPassword">New password</label>
-          <input
+        <div className="space-y-1">
+          <Label htmlFor="newPassword">New password</Label>
+          <Input
             id="newPassword"
             name="newPassword"
             type="password"
@@ -195,9 +215,11 @@ export default function AccountProfile() {
             aria-label="New password"
             minLength={8}
           />
+        </div>
 
-          <label htmlFor="newPasswordConfirm">New password (confirm)</label>
-          <input
+        <div className="space-y-1">
+          <Label htmlFor="newPasswordConfirm">New password (confirm)</Label>
+          <Input
             id="newPasswordConfirm"
             name="newPasswordConfirm"
             type="password"
@@ -205,20 +227,19 @@ export default function AccountProfile() {
             aria-label="New password confirm"
             minLength={8}
           />
-          <small>Passwords must be at least 8 characters.</small>
-        </fieldset>
-        {action?.error ? (
-          <p>
-            <mark>
-              <small>{action.error}</small>
-            </mark>
-          </p>
-        ) : (
-          <br />
+          <p className="text-sm text-muted-foreground">Passwords must be at least 8 characters.</p>
+        </div>
+
+        {action?.error && (
+          <Alert variant="destructive" className="my-4">
+            <AlertTitle>Couldn't update account</AlertTitle>
+            <AlertDescription>{action.error}</AlertDescription>
+          </Alert>
         )}
-        <button type="submit" disabled={state !== 'idle'}>
+
+        <Button type="submit" disabled={state !== 'idle'} className="mt-4">
           {state !== 'idle' ? 'Updating' : 'Update'}
-        </button>
+        </Button>
       </Form>
     </div>
   );

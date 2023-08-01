@@ -48,7 +48,7 @@ export async function loader({request, context}: LoaderArgs) {
 export default function SearchPage() {
   const {searchTerm, searchResults} = useLoaderData<typeof loader>();
   return (
-    <div className="search">
+    <div className="container p-4 mx-auto">
       <h1>Search</h1>
       <SearchForm searchTerm={searchTerm} />
       {!searchTerm || !searchResults.totalResults ? (

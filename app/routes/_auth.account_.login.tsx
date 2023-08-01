@@ -8,7 +8,7 @@ import {
 import {Form, Link, useActionData} from '@remix-run/react';
 import { Label } from '~/components/ui/label'
 import { Input } from '~/components/ui/input';
-import { Button } from '~/components/ui/button';
+import { Button, buttonVariants } from '~/components/ui/button';
 import { Alert, AlertTitle, AlertDescription } from '~/components/ui/alert';
 import {
   Card,
@@ -86,59 +86,57 @@ export default function Login() {
   const error = data?.error || null;
 
   return (
-    <div className="container p-4 mx-auto">
-      <Card className="max-w-md">
-        <CardHeader>
-          <CardTitle>Sign in.</CardTitle>
-          <CardDescription>
-            Sign in to your account to access your order history and update your account details.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form method="POST" className="flex flex-col gap-4">
-            <div>
-              <Label htmlFor="email">Email address</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                placeholder="Email address"
-                aria-label="Email address"
-                autoFocus
-              />
-            </div>
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                placeholder="Password"
-                aria-label="Password"
-                minLength={8}
-                required
-              />
-            </div>
+    <Card className="max-w-md">
+      <CardHeader>
+        <CardTitle>Sign in.</CardTitle>
+        <CardDescription>
+          Sign in to your account to access your order history and update your account details.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Form method="POST" className="flex flex-col gap-4">
+          <div>
+            <Label htmlFor="email">Email address</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              placeholder="Email address"
+              aria-label="Email address"
+              autoFocus
+            />
+          </div>
+          <div>
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              autoComplete="current-password"
+              placeholder="Password"
+              aria-label="Password"
+              minLength={8}
+              required
+            />
+          </div>
 
-            {error && (
-              <Alert variant="destructive">
-                <AlertTitle>Sign in failed</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            <Button type="submit">Sign in</Button>
-          </Form>
-        </CardContent>
+          {error && (
+            <Alert variant="destructive">
+              <AlertTitle>Sign in failed</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          <Button type="submit">Sign in</Button>
+        </Form>
+      </CardContent>
 
-        <CardFooter className="flex flex-wrap gap-4">
-          <Link to="/account/recover">Forgot password →</Link>
-          <Link to="/account/register">Register →</Link>
-        </CardFooter>
-      </Card>
-    </div>
+      <CardFooter className="flex flex-wrap gap-4">
+        <Link className={buttonVariants({ variant: 'link' })} to="/account/recover">Forgot password →</Link>
+        <Link className={buttonVariants({ variant: 'link' })} to="/account/register">Register →</Link>
+      </CardFooter>
+    </Card>
   );
 }
 
