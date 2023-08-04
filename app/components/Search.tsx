@@ -5,10 +5,10 @@ import {
   Form,
   type FormProps,
 } from '@remix-run/react';
-import {Image, Money, Pagination} from '@shopify/hydrogen';
-import React, {useRef, useEffect} from 'react';
-import {useFetchers} from '@remix-run/react';
-import { buttonVariants } from '~/components/ui/button';
+import { Image, Money, Pagination } from '@shopify/hydrogen';
+import React, { useRef, useEffect } from 'react';
+import { useFetchers } from '@remix-run/react';
+import { Button, buttonVariants } from '~/components/ui/button';
 
 import type {
   PredictiveProductFragment,
@@ -17,6 +17,7 @@ import type {
   SearchQuery,
 } from 'storefrontapi.generated';
 import { Icon } from '@iconify/react';
+import { Input } from './ui/input';
 
 type PredicticeSearchResultItemImage =
   | PredictiveCollectionFragment['image']
@@ -38,11 +39,11 @@ export type NormalizedPredictiveSearchResultItem = {
 };
 
 export type NormalizedPredictiveSearchResults = Array<
-  | {type: 'queries'; items: Array<NormalizedPredictiveSearchResultItem>}
-  | {type: 'products'; items: Array<NormalizedPredictiveSearchResultItem>}
-  | {type: 'collections'; items: Array<NormalizedPredictiveSearchResultItem>}
-  | {type: 'pages'; items: Array<NormalizedPredictiveSearchResultItem>}
-  | {type: 'articles'; items: Array<NormalizedPredictiveSearchResultItem>}
+  | { type: 'queries'; items: Array<NormalizedPredictiveSearchResultItem> }
+  | { type: 'products'; items: Array<NormalizedPredictiveSearchResultItem> }
+  | { type: 'collections'; items: Array<NormalizedPredictiveSearchResultItem> }
+  | { type: 'pages'; items: Array<NormalizedPredictiveSearchResultItem> }
+  | { type: 'articles'; items: Array<NormalizedPredictiveSearchResultItem> }
 >;
 
 export type NormalizedPredictiveSearch = {
@@ -59,14 +60,14 @@ type FetchSearchResultsReturn = {
 };
 
 export const NO_PREDICTIVE_SEARCH_RESULTS: NormalizedPredictiveSearchResults = [
-  {type: 'queries', items: []},
-  {type: 'products', items: []},
-  {type: 'collections', items: []},
-  {type: 'pages', items: []},
-  {type: 'articles', items: []},
+  { type: 'queries', items: [] },
+  { type: 'products', items: [] },
+  { type: 'collections', items: [] },
+  { type: 'pages', items: [] },
+  { type: 'articles', items: [] },
 ];
 
-export function SearchForm({searchTerm}: {searchTerm: string}) {
+export function SearchForm({ searchTerm }: { searchTerm: string }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   // focus the input when cmd+k is pressed
@@ -90,16 +91,18 @@ export function SearchForm({searchTerm}: {searchTerm: string}) {
   }, []);
 
   return (
-    <Form method="get">
-      <input
+    <Form method="get" className="flex items-center gap-2">
+      <Input
         defaultValue={searchTerm}
         name="q"
         placeholder="Search…"
         ref={inputRef}
         type="search"
       />
-      &nbsp;
-      <button type="submit">Search</button>
+      <Button type="submit">
+        <Icon icon="lucide:search" className="w-4 h-4 mr-2" />
+        Search
+      </Button>
     </Form>
   );
 }
@@ -112,7 +115,7 @@ export function SearchResults({
   }
   const keys = Object.keys(results) as Array<keyof typeof results>;
   return (
-    <div>
+    <div className="flex flex-col gap-8">
       {results &&
         keys.map((type) => {
           const resourceResults = results[type];
@@ -150,48 +153,49 @@ export function SearchResults({
   );
 }
 
-function SearchResultsProductsGrid({products}: Pick<SearchQuery, 'products'>) {
+function SearchResultsProductsGrid({ products }: Pick<SearchQuery, 'products'>) {
   return (
-    <div className="search-result">
-      <h4>Products</h4>
-      <Pagination connection={products}>
-        {({nodes, isLoading, NextLink, PreviousLink}) => {
-          const itemsMarkup = nodes.map((product) => (
-            <div className="search-results-item" key={product.id}>
-              <Link prefetch="intent" to={`/products/${product.handle}`}>
-                <span>{product.title}</span>
-              </Link>
-            </div>
-          ));
-          return (
-            <div>
-              <div>
-                <PreviousLink>
-                  {isLoading ? 'Loading...' : <span>↑ Load previous</span>}
-                </PreviousLink>
+    <div className="flex flex-col gap-2">
+      <h2>Products</h2>
+      <div>
+        <Pagination connection={products}>
+          {({ nodes, isLoading, NextLink, PreviousLink }) => {
+            const itemsMarkup = nodes.map((product) => (
+              <div className="search-results-item" key={product.id}>
+                <Link prefetch="intent" to={`/products/${product.handle}`}>
+                  <span>{product.title}</span>
+                </Link>
               </div>
+            ));
+            return (
               <div>
-                {itemsMarkup}
-                <br />
+                <div>
+                  <PreviousLink>
+                    {isLoading ? 'Loading...' : <span>↑ Load previous</span>}
+                  </PreviousLink>
+                </div>
+                <div>
+                  {itemsMarkup}
+                  <br />
+                </div>
+                <div>
+                  <NextLink>
+                    {isLoading ? 'Loading...' : <span>Load more ↓</span>}
+                  </NextLink>
+                </div>
               </div>
-              <div>
-                <NextLink>
-                  {isLoading ? 'Loading...' : <span>Load more ↓</span>}
-                </NextLink>
-              </div>
-            </div>
-          );
-        }}
-      </Pagination>
-      <br />
+            );
+          }}
+        </Pagination>
+      </div>
     </div>
   );
 }
 
-function SearchResultPageGrid({pages}: Pick<SearchQuery, 'pages'>) {
+function SearchResultPageGrid({ pages }: Pick<SearchQuery, 'pages'>) {
   return (
-    <div className="search-result">
-      <h3>Pages</h3>
+    <div className="flex flex-col gap-2">
+      <h2>Pages</h2>
       <div>
         {pages?.nodes?.map((page) => (
           <div className="search-results-item" key={page.id}>
@@ -201,15 +205,14 @@ function SearchResultPageGrid({pages}: Pick<SearchQuery, 'pages'>) {
           </div>
         ))}
       </div>
-      <br />
     </div>
   );
 }
 
-function SearchResultArticleGrid({articles}: Pick<SearchQuery, 'articles'>) {
+function SearchResultArticleGrid({ articles }: Pick<SearchQuery, 'articles'>) {
   return (
-    <div className="search-result">
-      <h3>Articles</h3>
+    <div className="flex flex-col gap-2">
+      <h2>Articles</h2>
       <div>
         {articles?.nodes?.map((article) => (
           <div className="search-results-item" key={article.id}>
@@ -263,8 +266,8 @@ export function PredictiveSearchForm({
       : searchAction;
     const newSearchTerm = event.target.value || '';
     fetcher.submit(
-      {q: newSearchTerm, limit: '6'},
-      {method, action: localizedAction},
+      { q: newSearchTerm, limit: '6' },
+      { method, action: localizedAction },
     );
   }
 
@@ -287,13 +290,13 @@ export function PredictiveSearchForm({
         inputRef.current.blur();
       }}
     >
-      {children({fetchResults, inputRef, fetcher})}
+      {children({ fetchResults, inputRef, fetcher })}
     </fetcher.Form>
   );
 }
 
 export function PredictiveSearchResults() {
-  const {results, totalResults, searchInputRef, searchTerm} =
+  const { results, totalResults, searchInputRef, searchTerm } =
     usePredictiveSearch();
 
   function goToSearchResult(event: React.MouseEvent<HTMLAnchorElement>) {
@@ -310,7 +313,7 @@ export function PredictiveSearchResults() {
   return (
     <div className="predictive-search-results">
       <div>
-        {results.map(({type, items}) => (
+        {results.map(({ type, items }) => (
           <PredictiveSearchResult
             goToSearchResult={goToSearchResult}
             items={items}
@@ -364,9 +367,8 @@ function PredictiveSearchResult({
   type,
 }: SearchResultTypeProps) {
   const isSuggestions = type === 'queries';
-  const categoryUrl = `/search?q=${
-    searchTerm.current
-  }&type=${pluralToSingularSearchType(type)}`;
+  const categoryUrl = `/search?q=${searchTerm.current
+    }&type=${pluralToSingularSearchType(type)}`;
 
   return (
     <div className="predictive-search-result" key={type}>
@@ -390,7 +392,7 @@ type SearchResultItemProps = Pick<SearchResultTypeProps, 'goToSearchResult'> & {
   item: NormalizedPredictiveSearchResultItem;
 };
 
-function SearchResultItem({goToSearchResult, item}: SearchResultItemProps) {
+function SearchResultItem({ goToSearchResult, item }: SearchResultItemProps) {
   return (
     <li className="predictive-search-result-item" key={item.id}>
       <Link onClick={goToSearchResult} to={item.url}>
@@ -449,7 +451,7 @@ function usePredictiveSearch(): UseSearchReturn {
     searchInputRef.current = document.querySelector('input[type="search"]');
   }, []);
 
-  return {...search, searchInputRef, searchTerm};
+  return { ...search, searchInputRef, searchTerm };
 }
 
 /**

@@ -98,32 +98,6 @@ aside main {
 
 /*
 * --------------------------------------------------
-* components/Footer
-* --------------------------------------------------
-*/
-.footer {
-  background: var(--color-dark);
-  margin-top: auto;
-}
-
-.footer-menu-missing {
-  display: inline-block;
-  margin: 1rem;
-}
-
-.footer-menu {
-  align-items: center;
-  display: flex;
-  grid-gap: 1rem;
-  padding: 1rem;
-}
-
-.footer-menu a {
-  color: var(--color-light);
-}
-
-/*
-* --------------------------------------------------
 * components/Cart
 * --------------------------------------------------
 */

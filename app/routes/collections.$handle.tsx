@@ -6,19 +6,36 @@ import {
   getPaginationVariables,
   Image,
   Money,
+  flattenConnection,
 } from '@shopify/hydrogen';
-import type {ProductItemFragment} from 'storefrontapi.generated';
+import type {
+  Filter,
+  ProductCollectionSortKeys,
+} from '@shopify/hydrogen/storefront-api-types';
+import type {ProductCardFragment} from 'storefrontapi.generated';
 import {useVariantUrl} from '~/utils';
+// import SortFilter from '~/components/SortFilter';
 import { buttonVariants } from '~/components/ui/button';
 import { Icon } from '@iconify/react';
+import { AppliedFilter, SortFilter, SortParam } from '~/components/SortFilter';
+import { PRODUCT_CARD_FRAGMENT } from '~/data/fragments';
 
 export const meta: V2_MetaFunction = ({data}) => {
   return [{title: `Hydrogen | ${data.collection.title} Collection`}];
 };
 
+type VariantFilterParam = Record<string, string | boolean>;
+type PriceFiltersQueryParam = Record<'price', { max?: number; min?: number }>;
+type VariantOptionFiltersQueryParam = Record<
+  'variantOption',
+  { name: string; value: string }
+>;
+type FiltersQueryParams = Array<
+  VariantFilterParam | PriceFiltersQueryParam | VariantOptionFiltersQueryParam
+>;
+
 export async function loader({request, params, context}: LoaderArgs) {
   const {handle} = params;
-  const {storefront} = context;
   const paginationVariables = getPaginationVariables(request, {
     pageBy: 8,
   });
@@ -27,72 +44,149 @@ export async function loader({request, params, context}: LoaderArgs) {
     return redirect('/collections');
   }
 
-  const {collection} = await storefront.query(COLLECTION_QUERY, {
-    variables: {handle, ...paginationVariables},
-  });
+  const searchParams = new URL(request.url).searchParams;
+  const knownFilters = ['productVendor', 'productType'];
+  const available = 'available';
+  const variantOption = 'variantOption';
+  const { sortKey, reverse } = getSortValuesFromParam(
+    searchParams.get('sort') as SortParam,
+  );
+  const filters: FiltersQueryParams = [];
+  const appliedFilters: AppliedFilter[] = [];
+
+  for (const [key, value] of searchParams.entries()) {
+    if (available === key) {
+      filters.push({ available: value === 'true' });
+      appliedFilters.push({
+        label: value === 'true' ? 'In stock' : 'Out of stock',
+        urlParam: {
+          key: available,
+          value,
+        },
+      });
+    } else if (knownFilters.includes(key)) {
+      filters.push({ [key]: value });
+      appliedFilters.push({ label: value, urlParam: { key, value } });
+    } else if (key.includes(variantOption)) {
+      const [name, val] = value.split(':');
+      filters.push({ variantOption: { name, value: val } });
+      appliedFilters.push({ label: val, urlParam: { key, value } });
+    }
+  }
+
+  // Builds min and max price filter since we can't stack them separately into
+  // the filters array. See price filters limitations:
+  // https://shopify.dev/custom-storefronts/products-collections/filter-products#limitations
+  if (searchParams.has('minPrice') || searchParams.has('maxPrice')) {
+    const price: { min?: number; max?: number } = {};
+    if (searchParams.has('minPrice')) {
+      price.min = Number(searchParams.get('minPrice')) || 0;
+      appliedFilters.push({
+        label: `Min: $${price.min}`,
+        urlParam: { key: 'minPrice', value: searchParams.get('minPrice')! },
+      });
+    }
+    if (searchParams.has('maxPrice')) {
+      price.max = Number(searchParams.get('maxPrice')) || 0;
+      appliedFilters.push({
+        label: `Max: $${price.max}`,
+        urlParam: { key: 'maxPrice', value: searchParams.get('maxPrice')! },
+      });
+    }
+    filters.push({
+      price,
+    });
+  }
+
+  const { collection } = await context.storefront.query(
+    COLLECTION_QUERY,
+    {
+      variables: {
+        ...paginationVariables,
+        handle,
+        filters,
+        sortKey,
+        reverse,
+        country: context.storefront.i18n.country,
+        language: context.storefront.i18n.language,
+      },
+    },
+  );
 
   if (!collection) {
     throw new Response(`Collection ${handle} not found`, {
       status: 404,
     });
   }
-  return json({collection});
+  return json({
+    collection,
+    appliedFilters,
+  });
 }
 
 export default function Collection() {
-  const {collection} = useLoaderData<typeof loader>();
+  const { collection, appliedFilters } = useLoaderData<typeof loader>()
 
   return (
-    <div className="container p-4 mx-auto">
+    <div className="container flex flex-col gap-4 p-4 mx-auto">
       <h1>{collection.title}</h1>
-      <p className="collection-description">{collection.description}</p>
-      <Pagination connection={collection.products}>
-        {({nodes, isLoading, PreviousLink, NextLink}) => (
-          <>
-            <div className="flex justify-center w-full">
-              <PreviousLink className={buttonVariants({ variant: 'default' })}>
-                {isLoading
-                  ? (<>
-                    <Icon icon="lucide:loader-2" className="w-4 h-4 mr-2 animate-spin" />
-                    <span>Loading previous...</span>
-                  </>)
-                  : (<>
-                    <Icon icon="lucide:arrow-up" className="w-4 h-4 mr-2" />
-                    <span>Load previous</span>
-                  </>)
-                }
-              </PreviousLink>
-            </div>
 
-            <ProductsGrid products={nodes} />
+      {collection.description && (
+        <p className="collection-description">{collection.description}</p>
+      )}
 
-            <div className="flex justify-center w-full">
-              <NextLink className={buttonVariants({ variant: 'default' })}>
-                {isLoading
-                  ? (<>
-                    <Icon icon="lucide:loader-2" className="w-4 h-4 mr-2 animate-spin" />
-                    <span>Loading more...</span>
-                  </>)
-                  : (<>
-                    <Icon icon="lucide:arrow-down" className="w-4 h-4 mr-2" />
-                    <span>Load more</span>
-                  </>)
-                }
-              </NextLink>
-            </div>
-          </>
-        )}
-      </Pagination>
+      <SortFilter
+        filters={collection.products.filters as Filter[]}
+        appliedFilters={appliedFilters}
+      >
+        <Pagination connection={collection.products}>
+          {({nodes, isLoading, PreviousLink, NextLink}) => (
+            <>
+              <div className="flex justify-center w-full">
+                <PreviousLink className={buttonVariants({ variant: 'default' })} aria-disabled={isLoading}>
+                  {isLoading
+                    ? (<>
+                      <Icon icon="lucide:loader-2" className="w-4 h-4 mr-2 animate-spin" />
+                      <span>Loading previous...</span>
+                    </>)
+                    : (<>
+                      <Icon icon="lucide:arrow-up" className="w-4 h-4 mr-2" />
+                      <span>Load previous</span>
+                    </>)
+                  }
+                </PreviousLink>
+              </div>
+
+              <ProductsGrid products={nodes} />
+
+              <div className="flex justify-center w-full">
+                <NextLink className={buttonVariants({ variant: 'default' })} aria-disabled={isLoading}>
+                  {isLoading
+                    ? (<>
+                      <Icon icon="lucide:loader-2" className="w-4 h-4 mr-2 animate-spin" />
+                      <span>Loading more...</span>
+                    </>)
+                    : (<>
+                      <Icon icon="lucide:arrow-down" className="w-4 h-4 mr-2" />
+                      <span>Load more</span>
+                    </>)
+                  }
+                </NextLink>
+              </div>
+            </>
+          )}
+        </Pagination>
+      </SortFilter>
     </div>
   );
 }
 
-function ProductsGrid({products}: {products: ProductItemFragment[]}) {
+function ProductsGrid({products}: {products: ProductCardFragment[]}) {
   return (
     <div className="products-grid">
       {products.map((product, index) => {
         return (
-          <ProductItem
+          <ProductCard
             key={product.id}
             product={product}
             loading={index < 8 ? 'eager' : undefined}
@@ -103,11 +197,11 @@ function ProductsGrid({products}: {products: ProductItemFragment[]}) {
   );
 }
 
-function ProductItem({
+function ProductCard({
   product,
   loading,
 }: {
-  product: ProductItemFragment;
+  product: ProductCardFragment;
   loading?: 'eager' | 'lazy';
 }) {
   const variant = product.variants.nodes[0];
@@ -136,48 +230,15 @@ function ProductItem({
   );
 }
 
-const PRODUCT_ITEM_FRAGMENT = `#graphql
-  fragment MoneyProductItem on MoneyV2 {
-    amount
-    currencyCode
-  }
-  fragment ProductItem on Product {
-    id
-    handle
-    title
-    featuredImage {
-      id
-      altText
-      url
-      width
-      height
-    }
-    priceRange {
-      minVariantPrice {
-        ...MoneyProductItem
-      }
-      maxVariantPrice {
-        ...MoneyProductItem
-      }
-    }
-    variants(first: 1) {
-      nodes {
-        selectedOptions {
-          name
-          value
-        }
-      }
-    }
-  }
-` as const;
-
 // NOTE: https://shopify.dev/docs/api/storefront/2022-04/objects/collection
 const COLLECTION_QUERY = `#graphql
-  ${PRODUCT_ITEM_FRAGMENT}
-  query Collection(
+  query CollectionDetails(
     $handle: String!
     $country: CountryCode
     $language: LanguageCode
+    $filters: [ProductFilter!]
+    $sortKey: ProductCollectionSortKeys!
+    $reverse: Boolean
     $first: Int
     $last: Int
     $startCursor: String
@@ -188,14 +249,39 @@ const COLLECTION_QUERY = `#graphql
       handle
       title
       description
+      seo {
+        description
+        title
+      }
+      image {
+        id
+        url
+        width
+        height
+        altText
+      }
       products(
         first: $first,
         last: $last,
         before: $startCursor,
-        after: $endCursor
+        after: $endCursor,
+        filters: $filters,
+        sortKey: $sortKey,
+        reverse: $reverse
       ) {
+        filters {
+          id
+          label
+          type
+          values {
+            id
+            label
+            count
+            input
+          }
+        }
         nodes {
-          ...ProductItem
+          ...ProductCard
         }
         pageInfo {
           hasPreviousPage
@@ -206,4 +292,43 @@ const COLLECTION_QUERY = `#graphql
       }
     }
   }
+  ${PRODUCT_CARD_FRAGMENT}
 ` as const;
+
+function getSortValuesFromParam(sortParam: SortParam | null): {
+  sortKey: ProductCollectionSortKeys;
+  reverse: boolean;
+} {
+  switch (sortParam) {
+    case 'price-high-low':
+      return {
+        sortKey: 'PRICE',
+        reverse: true,
+      };
+    case 'price-low-high':
+      return {
+        sortKey: 'PRICE',
+        reverse: false,
+      };
+    case 'best-selling':
+      return {
+        sortKey: 'BEST_SELLING',
+        reverse: false,
+      };
+    case 'newest':
+      return {
+        sortKey: 'CREATED',
+        reverse: true,
+      };
+    case 'featured':
+      return {
+        sortKey: 'MANUAL',
+        reverse: false,
+      };
+    default:
+      return {
+        sortKey: 'RELEVANCE',
+        reverse: false,
+      };
+  }
+}

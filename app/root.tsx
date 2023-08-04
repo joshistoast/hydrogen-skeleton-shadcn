@@ -1,23 +1,21 @@
-import {
-  isRouteErrorResponse,
-  useMatches,
-  useRouteError,
-} from '@remix-run/react';
-import {defer, type LoaderArgs} from '@shopify/remix-oxygen';
+import { defer, type LoaderArgs } from '@shopify/remix-oxygen';
 import {
   Links,
   Meta,
   Outlet,
   Scripts,
-  ScrollRestoration,
+  useMatches,
+  useRouteError,
   useLoaderData,
+  ScrollRestoration,
+  isRouteErrorResponse,
 } from '@remix-run/react';
-import type {CustomerAccessToken} from '@shopify/hydrogen-react/storefront-api-types';
-import type {HydrogenSession} from '../server';
+import type { CustomerAccessToken } from '@shopify/hydrogen-react/storefront-api-types';
+import type { HydrogenSession } from '../server';
 import favicon from '../public/favicon.svg';
 import resetStyles from './styles/reset.css';
 import appStyles from './styles/app.css';
-import {Layout} from '~/components/Layout';
+import { Layout } from '~/components/Layout';
 import tailwindCss from './styles/tailwind.css';
 import { ThemeProvider } from '~/components/ThemeContext';
 

@@ -89,7 +89,6 @@ export function HeaderMenu({
 function HeaderCtas({
   isLoggedIn,
   cart,
-  header,
 }: Pick<HeaderProps, 'isLoggedIn' | 'cart' | 'header'>) {
   return (
     <nav className="flex items-center gap-1 ml-auto" role="navigation">
@@ -127,7 +126,7 @@ function HeaderMenuMobileToggle({
 function SearchToggle() {
   return (
     <SearchAside>
-      <Button variant="ghost" size="icon">
+      <Button variant="ghost" size="icon" title="Search">
         <Icon icon="lucide:search" className="w-4 h-4" />
       </Button>
     </SearchAside>
