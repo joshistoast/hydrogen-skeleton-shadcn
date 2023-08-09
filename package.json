@@ -33,7 +33,6 @@
     "graphql": "^16.7.1",
     "graphql-tag": "^2.12.6",
     "isbot": "^3.6.13",
-    "lucide-react": "^0.263.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.45.2",
