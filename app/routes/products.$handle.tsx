@@ -9,8 +9,6 @@ import type {
   ProductVariantFragment,
 } from 'storefrontapi.generated';
 import { Button, buttonVariants } from '~/components/ui/button'
-import { Loader2 } from 'lucide-react'
-
 import {
   Image,
   Money,
@@ -312,7 +310,7 @@ function AddToCartButton({
             disabled={disabled || fetcher.state !== 'idle'}
           >
             {fetcher.state !== 'idle'
-              ? (<Loader2 className="w-4 h-4 mr-2 animate-spin" />)
+              ? (<Icon icon="lucide:loader-2" className="w-4 h-4 mr-2 animate-spin" />)
               : (<Icon icon="lucide:plus" className="w-4 h-4 mr-2" />)
             }
             {children}
