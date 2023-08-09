@@ -47,7 +47,7 @@ export function Layout({
   return (
     <div className="flex flex-col min-h-screen">
       <Header header={header} cart={cart} isLoggedIn={isLoggedIn} />
-      <main className="flex-1">
+      <main className="flex flex-col flex-1">
         {children}
       </main>
       <Suspense>

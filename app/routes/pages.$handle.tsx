@@ -28,11 +28,11 @@ export default function Page() {
   const {page} = useLoaderData<typeof loader>();
 
   return (
-    <div className="page">
+    <div className="container p-4 mx-auto">
       <header>
         <h1>{page.title}</h1>
       </header>
-      <main dangerouslySetInnerHTML={{__html: page.body}} />
+      <main className="prose-sm prose-invert prose-neutral" dangerouslySetInnerHTML={{__html: page.body}} />
     </div>
   );
 }

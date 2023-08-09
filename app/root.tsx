@@ -9,6 +9,7 @@ import {
   useLoaderData,
   ScrollRestoration,
   isRouteErrorResponse,
+  Link,
 } from '@remix-run/react';
 import type { CustomerAccessToken } from '@shopify/hydrogen-react/storefront-api-types';
 import type { HydrogenSession } from '../server';
@@ -18,6 +19,8 @@ import appStyles from './styles/app.css';
 import { Layout } from '~/components/Layout';
 import tailwindCss from './styles/tailwind.css';
 import { ThemeProvider } from '~/components/ThemeContext';
+import { buttonVariants } from './components/ui/button';
+import { Icon } from '@iconify/react';
 
 export function links() {
   return [
@@ -124,17 +127,23 @@ export function ErrorBoundary() {
         <Links />
       </head>
       <body>
-        <Layout {...root.data}>
-          <div className="route-error">
-            <h1>Oops</h1>
-            <h2>{errorStatus}</h2>
-            {errorMessage && (
-              <fieldset>
-                <pre>{errorMessage}</pre>
-              </fieldset>
-            )}
-          </div>
-        </Layout>
+        <ThemeProvider>
+          <Layout {...root.data}>
+            <div className="flex items-center flex-1">
+              <div className="container p-4 mx-auto">
+                <p className="font-mono font-semibold text-rose-400">{errorStatus}</p>
+                <h1>Oops</h1>
+                {errorMessage && (
+                  <p className="text-muted-foreground">{errorMessage}</p>
+                )}
+                <Link to="/" className={`${buttonVariants({ variant: 'link' })} mt-6 pl-0`}>
+                  <Icon icon="lucide:arrow-left" className="w-4 h-4 mr-2" />
+                  Go home
+                </Link>
+              </div>
+            </div>
+          </Layout>
+        </ThemeProvider>
         <ScrollRestoration />
         <Scripts />
       </body>
