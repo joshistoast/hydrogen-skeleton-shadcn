@@ -81,7 +81,7 @@ function CartLineItem({
 
   return (
     <Card key={id}>
-      <CardContent className="flex items-start gap-3 p-4">
+      <CardContent className="flex items-start gap-3 pt-4">
         {image && (
           <Image
             alt={title}
@@ -121,7 +121,7 @@ function CartLineItem({
         </div>
       </CardContent>
 
-      <CardFooter className="flex justify-end p-4 pt-0">
+      <CardFooter className="flex justify-end pt-0">
         <CartLineQuantity line={line} />
       </CardFooter>
     </Card>

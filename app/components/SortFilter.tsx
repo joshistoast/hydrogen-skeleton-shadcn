@@ -16,7 +16,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from './ui/accordion';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { Button, buttonVariants } from './ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from './ui/sheet';
 import { Badge } from './ui/badge';
@@ -93,6 +92,7 @@ export function FiltersDrawer({
   const location = useLocation();
 
   const filterMarkup = (filter: Filter, option: Filter['values'][0]) => {
+    const isActive = isFilterActive(filter, option.input as string, params);
     switch (filter.type) {
       case 'PRICE_RANGE':
         const min =
@@ -117,7 +117,7 @@ export function FiltersDrawer({
         return (
           <Link
             className={`
-              ${buttonVariants({ variant: 'ghost' })}
+              ${buttonVariants({ variant: isActive ? 'default' : 'ghost' })}
               !justify-start w-full
             `}
             prefetch="intent"
@@ -130,33 +130,34 @@ export function FiltersDrawer({
   };
 
   return (
-    <>
-      <Accordion type="multiple">
-        {appliedFilters.length > 0 && (
-          <AppliedFilters filters={appliedFilters} />
-        )}
-        <SortMenu />
-        {filters.map(
-          (filter: Filter) =>
-            filter.values.length > 1 && (
-              <AccordionItem value={filter.id} key={filter.id}>
-                <AccordionTrigger>
-                  {filter.label}
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="flex flex-col gap-1" key={filter.id}>
-                    {filter.values?.map((option) => (
-                      <div key={option.id}>
-                        {filterMarkup(filter, option)}
-                      </div>
-                    ))}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            ),
-        )}
-      </Accordion>
-    </>
+    <Accordion type="multiple">
+      {appliedFilters.length > 0 && (
+        <AppliedFilters filters={appliedFilters} />
+      )}
+      <SortMenu />
+      {filters.map(
+        (filter: Filter) =>
+          filter.values.length > 1 && (
+            <AccordionItem value={filter.id} key={filter.id}>
+              <AccordionTrigger>
+                <div className="flex items-center gap-2">
+                  <span>{filter.label}</span>
+                  <Badge variant="secondary">{filter.values.length}</Badge>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="flex flex-col gap-1" key={filter.id}>
+                  {filter.values?.map((option) => (
+                    <div key={option.id}>
+                      {filterMarkup(filter, option)}
+                    </div>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          ),
+      )}
+    </Accordion>
   );
 }
 
@@ -166,7 +167,12 @@ function AppliedFilters({ filters = [] }: { filters: AppliedFilter[] }) {
   return (
     <>
       <AccordionItem value="applied-filters">
-        <AccordionTrigger>Applied filters</AccordionTrigger>
+        <AccordionTrigger>
+          <div className="flex items-center gap-2">
+            <span>Applied Filters</span>
+            <Badge variant="secondary">{filters.length}</Badge>
+          </div>
+        </AccordionTrigger>
         <AccordionContent>
           <div className="flex flex-wrap gap-2">
             {filters.map((filter: AppliedFilter) => {
@@ -230,6 +236,38 @@ function getFilterLink(
   const paramsClone = new URLSearchParams(params);
   const newParams = filterInputToParams(filter.type, rawInput, paramsClone);
   return `${location.pathname}?${newParams.toString()}`;
+}
+
+function isFilterActive(
+  filter: Filter,
+  rawInput: string | Record<string, any>,
+  params: URLSearchParams,
+): boolean {
+  const input = (
+    typeof rawInput === 'string' ? JSON.parse(rawInput) : rawInput
+  ) as Record<string, any>;
+
+  switch (filter.type) {
+    case 'LIST':
+      return Object.entries(input).some(([key, value]) => {
+        if (typeof value === 'string') {
+          return params.get(key) === value;
+        } else if (typeof value === 'boolean') {
+          return params.get(key) === value.toString();
+        } else {
+          const { name, value: val } = value as { name: string; value: string };
+          const variantValue = `${name}:${val}`;
+          return params.getAll('variantOption').includes(variantValue);
+        }
+      });
+
+    case 'PRICE_RANGE':
+      // You can add similar logic for PRICE_RANGE here if needed.
+      return false;
+
+    default:
+      return false;
+  }
 }
 
 const PRICE_RANGE_FILTER_DEBOUNCE = 500;
