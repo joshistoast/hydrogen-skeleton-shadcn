@@ -168,21 +168,23 @@ function AppliedFilters({ filters = [] }: { filters: AppliedFilter[] }) {
       <AccordionItem value="applied-filters">
         <AccordionTrigger>Applied filters</AccordionTrigger>
         <AccordionContent>
-          {filters.map((filter: AppliedFilter) => {
-            return (
-              <Link
-                to={getAppliedFilterLink(filter, params, location)}
-                className={`
-                  ${buttonVariants({ variant: 'outline', size: 'sm' })}
-                  text-red-300 hover:text-red-400
-                `}
-                key={`${filter.label}-${filter.urlParam}`}
-              >
-                <Icon icon="lucide:trash" className="w-5 h-5 mr-2" />
-                <span>{filter.label}</span>
-              </Link>
-            );
-          })}
+          <div className="flex flex-wrap gap-2">
+            {filters.map((filter: AppliedFilter) => {
+              return (
+                <Link
+                  to={getAppliedFilterLink(filter, params, location)}
+                  className={`
+                    ${buttonVariants({ variant: 'outline', size: 'sm' })}
+                    text-red-300 hover:text-red-400
+                  `}
+                  key={`${filter.label}-${filter.urlParam}`}
+                >
+                  <Icon icon="lucide:trash" className="w-5 h-5 mr-2" />
+                  <span>{filter.label}</span>
+                </Link>
+              );
+            })}
+          </div>
         </AccordionContent>
       </AccordionItem>
     </>
