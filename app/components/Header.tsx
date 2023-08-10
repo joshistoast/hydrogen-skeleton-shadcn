@@ -129,7 +129,7 @@ type CartBadgeProps = {
 function CartBadge({count, cart}: CartBadgeProps) {
   return (
     <CartAside cart={cart}>
-      <Button variant="ghost">
+      <Button variant="outline">
         <Icon icon="lucide:shopping-cart" className="w-4 h-4 mr-2" />
         {count}
       </Button>
