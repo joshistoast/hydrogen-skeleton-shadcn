@@ -208,7 +208,7 @@ function ProductCard({
   const variantUrl = useVariantUrl(product.handle, variant.selectedOptions);
   return (
     <Link
-      className="product-item"
+      className="flex flex-col gap-2"
       key={product.id}
       prefetch="intent"
       to={variantUrl}
@@ -216,16 +216,17 @@ function ProductCard({
       {product.featuredImage && (
         <Image
           alt={product.featuredImage.altText || product.title}
-          aspectRatio="1/1"
+          aspectRatio='1/1'
           data={product.featuredImage}
           loading={loading}
           sizes="(min-width: 45em) 400px, 100vw"
+          className="object-cover w-full h-full"
         />
       )}
-      <h4>{product.title}</h4>
-      <small>
-        <Money data={product.priceRange.minVariantPrice} />
-      </small>
+      <div>
+        <h4>{product.title}</h4>
+        <Money data={product.priceRange.minVariantPrice} className="text-sm" />
+      </div>
     </Link>
   );
 }

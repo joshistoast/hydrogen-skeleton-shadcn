@@ -144,7 +144,6 @@ export default function Register() {
               required
               placeholder="Password"
               aria-label="Password"
-              autoFocus
             />
           </div>
           <div>

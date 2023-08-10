@@ -20,6 +20,7 @@ import {
 import type {CartLineInput} from '@shopify/hydrogen/storefront-api-types';
 import {getVariantUrl} from '~/utils';
 import { Icon } from '@iconify/react';
+import { Badge, BadgeProps } from '~/components/ui/badge';
 
 export const meta: V2_MetaFunction = ({data}) => {
   return [{title: `Hydrogen | ${data.product.title}`}];
@@ -107,7 +108,7 @@ export default function Product() {
   const {product, variants} = useLoaderData<typeof loader>();
   const {selectedVariant} = product;
   return (
-    <div className="container grid p-4 mx-auto md:gap-16 md:grid-cols-2">
+    <div className="container grid items-start p-4 mx-auto md:gap-16 md:grid-cols-2">
       <ProductImage image={selectedVariant?.image} />
       <ProductMain
         selectedVariant={selectedVariant}
@@ -123,13 +124,13 @@ function ProductImage({image}: {image: ProductVariantFragment['image']}) {
     return <div className="product-image" />;
   }
   return (
-    <div className="product-image">
+    <div>
       <Image
         alt={image.altText || 'Product Image'}
-        aspectRatio="1/1"
         data={image}
         key={image.id}
         sizes="(min-width: 45em) 50vw, 100vw"
+        className="object-cover w-full h-full"
       />
     </div>
   );
@@ -146,10 +147,12 @@ function ProductMain({
 }) {
   const {title, descriptionHtml} = product;
   return (
-    <div className="product-main">
-      <h1>{title}</h1>
-      <ProductPrice selectedVariant={selectedVariant} />
-      <br />
+    <div className="flex flex-col gap-6 py-6">
+      <div className="flex flex-col gap-2">
+        <ProductBadges selectedVariant={selectedVariant} />
+        <h1>{title}</h1>
+        <ProductPrice selectedVariant={selectedVariant} />
+      </div>
       <Suspense
         fallback={
           <ProductForm
@@ -172,16 +175,37 @@ function ProductMain({
           )}
         </Await>
       </Suspense>
-      <br />
-      <br />
-      <p>
-        <strong>Description</strong>
-      </p>
-      <br />
-      <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
-      <br />
+      <div className="prose-sm prose-neutral prose-invert" dangerouslySetInnerHTML={{__html: descriptionHtml}} />
     </div>
   );
+}
+
+function ProductBadges({
+  selectedVariant
+}: {
+  selectedVariant?: ProductVariantFragment | null}
+) {
+  const badges: {
+    label: string;
+    variant: BadgeProps['variant'];
+  }[] = []
+
+  if (selectedVariant?.compareAtPrice) {
+    badges.push({ label: 'Sale', variant: 'destructive' })
+  }
+  if (!selectedVariant?.availableForSale) {
+    badges.push({ label: 'Sold out', variant: 'outline' })
+  }
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {badges.map(({ label, variant }) => (
+        <Badge key={label} variant={variant}>
+          {label}
+        </Badge>
+      ))}
+    </div>
+  )
 }
 
 function ProductPrice({
@@ -192,16 +216,12 @@ function ProductPrice({
   return (
     <div className="product-price">
       {selectedVariant?.compareAtPrice ? (
-        <>
-          <p>Sale</p>
-          <br />
-          <div className="product-price-on-sale">
-            {selectedVariant ? <Money data={selectedVariant.price} /> : null}
-            <s>
-              <Money data={selectedVariant.compareAtPrice} />
-            </s>
-          </div>
-        </>
+        <div className="flex items-center gap-2">
+          {selectedVariant ? <Money data={selectedVariant.price} /> : null}
+          <span className="line-through text-muted-foreground">
+            <Money data={selectedVariant.compareAtPrice} />
+          </span>
+        </div>
       ) : (
         selectedVariant?.price && <Money data={selectedVariant?.price} />
       )}
@@ -219,7 +239,7 @@ function ProductForm({
   variants: Array<ProductVariantFragment>;
 }) {
   return (
-    <div className="product-form">
+    <div className="flex flex-col gap-6">
       <VariantSelector
         handle={product.handle}
         options={product.options}
@@ -227,7 +247,6 @@ function ProductForm({
       >
         {({option}) => <ProductOptions key={option.name} option={option} />}
       </VariantSelector>
-      <br />
       <AddToCartButton
         disabled={!selectedVariant || !selectedVariant.availableForSale}
         lines={
@@ -251,11 +270,11 @@ function ProductOptions({option}: {option: VariantOption}) {
   return (
     <div className="flex flex-col gap-2" key={option.name}>
       <h5 className="flex items-center gap-1">
-        {option.name}:
+        {option.name}
         {option.values.find((value) => value.isActive) && (
-          <span className="text-muted-foreground">
+          <Badge variant="outline">
             {option.values.find((value) => value.isActive)?.value}
-          </span>
+          </Badge>
         )}
       </h5>
       <div className="flex flex-wrap gap-3">
@@ -272,12 +291,14 @@ function ProductOptions({option}: {option: VariantOption}) {
               replace
               to={to}
             >
+              {isActive && (
+                <Icon icon="lucide:check" className="w-4 h-4 mr-2" />
+              )}
               {value}
             </Link>
           );
         })}
       </div>
-      <br />
     </div>
   );
 }
@@ -308,6 +329,7 @@ function AddToCartButton({
             type="submit"
             onClick={onClick}
             disabled={disabled || fetcher.state !== 'idle'}
+            size="lg"
           >
             {fetcher.state !== 'idle'
               ? (<Icon icon="lucide:loader-2" className="w-4 h-4 mr-2 animate-spin" />)

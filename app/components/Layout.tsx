@@ -28,6 +28,7 @@ import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Icon } from '@iconify/react';
 import React from 'react';
+import { Badge } from './ui/badge';
 
 export type LayoutProps = {
   cart: Promise<CartApiQueryFragment | null>;
@@ -72,7 +73,16 @@ export function CartAside({cart, children}: CartAsideProps) {
 
       <SheetContent className="flex flex-col">
         <SheetHeader>
-          <SheetTitle>Cart</SheetTitle>
+          <SheetTitle className="flex items-center gap-2">
+            Cart
+            {cart && (
+              <Badge variant="secondary">
+                <Await resolve={cart}>
+                  {(cart) => cart?.totalQuantity}
+                </Await>
+              </Badge>
+            )}
+          </SheetTitle>
           <SheetClose />
         </SheetHeader>
         <Suspense fallback={<p>Loading cart ...</p>}>
