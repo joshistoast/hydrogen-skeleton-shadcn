@@ -2,20 +2,11 @@ import {Await, NavLink, useMatches} from '@remix-run/react';
 import {Suspense} from 'react';
 import type {LayoutProps} from './Layout';
 import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuIndicator,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  NavigationMenuViewport,
   navigationMenuTriggerStyle,
 } from "~/components/ui/navigation-menu"
 import { Icon } from '@iconify/react';
 import { SearchAside, MobileMenuAside, CartAside } from '~/components/Layout'
-import { Button } from './ui/button';
-
+import { Button, buttonVariants } from './ui/button';
 
 type HeaderProps = Pick<LayoutProps, 'header' | 'cart' | 'isLoggedIn'>;
 
@@ -69,7 +60,7 @@ export function HeaderMenu({
             className={({ isActive, isPending }) => `
               ${navigationMenuTriggerStyle()}
               ${viewport === 'mobile' && '!w-full !justify-start'}
-              ${isActive && 'bg-accent'}
+              ${isActive && '!bg-accent'}
               ${isPending && 'animate-pulse'}
             `}
             end
@@ -94,15 +85,13 @@ function HeaderCtas({
     <nav className="flex items-center gap-1 ml-auto" role="navigation">
       <NavLink
         className={({ isActive, isPending }) => `
-          ${navigationMenuTriggerStyle()}
-          ${isActive && 'bg-accent'}
+          ${buttonVariants({ variant: isActive ? 'secondary' : 'ghost', size: 'icon' })}
           ${isPending && 'animate-pulse'}
         `}
         prefetch="intent"
         to="/account"
       >
-        <Icon icon="lucide:user" className="w-4 h-4 mr-2" />
-        {isLoggedIn ? 'Account' : 'Sign in'}
+        <Icon icon="lucide:user" className="w-4 h-4" />
       </NavLink>
       <SearchToggle />
       <CartToggle cart={cart} />

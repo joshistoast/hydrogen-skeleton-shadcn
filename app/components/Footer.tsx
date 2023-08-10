@@ -1,11 +1,15 @@
 import {useMatches, NavLink} from '@remix-run/react';
 import type {FooterQuery} from 'storefrontapi.generated';
 import { buttonVariants } from './ui/button';
+import ThemeToggle from './ThemeToggle';
 
 export function Footer({menu}: FooterQuery) {
   return (
     <footer className="mt-4 border-t">
-      <FooterMenu menu={menu} />
+      <div className="container flex justify-between p-4 mx-auto">
+        <FooterMenu menu={menu} />
+        <ThemeToggle />
+      </div>
     </footer>
   );
 }
@@ -14,7 +18,7 @@ function FooterMenu({menu}: Pick<FooterQuery, 'menu'>) {
   const [root] = useMatches();
   const publicStoreDomain = root?.data?.publicStoreDomain;
   return (
-    <nav className="container p-4 mx-auto text-muted-foreground" role="navigation">
+    <nav role="navigation">
       {(menu || FALLBACK_FOOTER_MENU).items.map((item) => {
         if (!item.url) return null;
         // if the url is internal, we strip the domain
@@ -32,8 +36,8 @@ function FooterMenu({menu}: Pick<FooterQuery, 'menu'>) {
           <NavLink
             end
             className={({ isActive, isPending }) => `
-              ${isActive ? 'text-primary' : ''}
               ${buttonVariants({ variant: 'link' })}
+              ${isActive ? 'text-primary' : '!text-muted-foreground'}
               ${isPending ? 'animate-pulse' : ''}
             `}
             key={item.id}
