@@ -1,3 +1,4 @@
+import { Icon } from '@iconify/react';
 import {Link, useLoaderData} from '@remix-run/react';
 import {Money, Pagination, getPaginationVariables} from '@shopify/hydrogen';
 import {
@@ -10,7 +11,9 @@ import type {
   CustomerOrdersFragment,
   OrderItemFragment,
 } from 'storefrontapi.generated';
+import { Badge } from '~/components/ui/badge';
 import { buttonVariants } from '~/components/ui/button';
+import { Card, CardFooter, CardHeader, CardTitle } from '~/components/ui/card';
 
 export const meta: V2_MetaFunction = () => {
   return [{title: 'Orders'}];
@@ -56,33 +59,44 @@ export default function Orders() {
   const {customer} = useLoaderData<{customer: CustomerOrdersFragment}>();
   const {orders, numberOfOrders} = customer;
   return (
-    <div className="orders">
+    <div>
       <h2>
         Orders <small>({numberOfOrders})</small>
       </h2>
-      <br />
-      {orders.nodes.length ? <OrdersTable orders={orders} /> : <EmptyOrders />}
+      {orders.nodes.length ? <OrdersList orders={orders} /> : <EmptyOrders />}
     </div>
   );
 }
 
-function OrdersTable({orders}: Pick<CustomerOrdersFragment, 'orders'>) {
+function OrdersList({orders}: Pick<CustomerOrdersFragment, 'orders'>) {
   return (
-    <div className="acccount-orders">
+    <div className="flex flex-col gap-4">
       {orders?.nodes.length ? (
         <Pagination connection={orders}>
           {({nodes, isLoading, PreviousLink, NextLink}) => {
             return (
               <>
-                <PreviousLink>
-                  {isLoading ? 'Loading...' : <span>↑ Load previous</span>}
-                </PreviousLink>
+                <div className="flex justify-center w-full">
+                  <PreviousLink className={buttonVariants({ variant: 'default' })} aria-disabled={isLoading}>
+                    <>
+                      <Icon icon={isLoading ? 'lucide:loader-2' : 'lucide:arrow-up'} className={`${isLoading ? 'animate-spin' : ''} w-4 h-4 mr-2`} />
+                      <span>{isLoading ? 'Loading' : 'Load'} previous</span>
+                    </>
+                  </PreviousLink>
+                </div>
+
                 {nodes.map((order) => {
                   return <OrderItem key={order.id} order={order} />;
                 })}
-                <NextLink>
-                  {isLoading ? 'Loading...' : <span>Load more ↓</span>}
-                </NextLink>
+
+                <div className="flex justify-center w-full">
+                  <NextLink className={buttonVariants({ variant: 'default' })} aria-disabled={isLoading}>
+                    <>
+                      <Icon icon={isLoading ? 'lucide:loader-2' : 'lucide:arrow-down'} className={`${isLoading ? 'animate-spin' : ''} mr-2 w-4 h-4`} />
+                      <span>{isLoading ? 'Loading' : 'Load'} more</span>
+                    </>
+                  </NextLink>
+                </div>
               </>
             );
           }}
@@ -108,19 +122,31 @@ function EmptyOrders() {
 
 function OrderItem({order}: {order: OrderItemFragment}) {
   return (
-    <>
-      <fieldset>
-        <Link to={`/account/orders/${order.id}`}>
-          <strong>#{order.orderNumber}</strong>
+    <Card>
+      <CardHeader>
+        <div className="flex flex-wrap items-center gap-1">
+          <Badge variant="secondary">{order.financialStatus}</Badge>
+          <Badge variant="outline">{order.fulfillmentStatus}</Badge>
+        </div>
+        <CardTitle>
+          #{order.orderNumber}
+        </CardTitle>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span>{new Date(order.processedAt).toDateString()}</span>
+          •
+          <Money data={order.currentTotalPrice} />
+        </div>
+      </CardHeader>
+      <CardFooter>
+        <Link
+          className={`${buttonVariants({ variant: 'link' })} !p-0`}
+          to={`/account/orders/${btoa(order.id)}`}
+        >
+          View Order
+          <Icon icon="lucide:arrow-right" className="ml-1" />
         </Link>
-        <p>{new Date(order.processedAt).toDateString()}</p>
-        <p>{order.financialStatus}</p>
-        <p>{order.fulfillmentStatus}</p>
-        <Money data={order.currentTotalPrice} />
-        <Link to={`/account/orders/${btoa(order.id)}`}>View Order →</Link>
-      </fieldset>
-      <br />
-    </>
+      </CardFooter>
+    </Card>
   );
 }
 

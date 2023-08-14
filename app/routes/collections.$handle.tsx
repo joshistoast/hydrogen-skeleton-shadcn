@@ -144,16 +144,10 @@ export default function Collection() {
             <>
               <div className="flex justify-center w-full">
                 <PreviousLink className={buttonVariants({ variant: 'default' })} aria-disabled={isLoading}>
-                  {isLoading
-                    ? (<>
-                      <Icon icon="lucide:loader-2" className="w-4 h-4 mr-2 animate-spin" />
-                      <span>Loading previous...</span>
-                    </>)
-                    : (<>
-                      <Icon icon="lucide:arrow-up" className="w-4 h-4 mr-2" />
-                      <span>Load previous</span>
-                    </>)
-                  }
+                  <>
+                    <Icon icon={isLoading ? 'lucide:loader-2' : 'lucide:arrow-up'} className={`${isLoading ? 'animate-spin' : ''} w-4 h-4 mr-2`} />
+                    <span>{isLoading ? 'Loading' : 'Load'} previous</span>
+                  </>
                 </PreviousLink>
               </div>
 
@@ -161,16 +155,10 @@ export default function Collection() {
 
               <div className="flex justify-center w-full">
                 <NextLink className={buttonVariants({ variant: 'default' })} aria-disabled={isLoading}>
-                  {isLoading
-                    ? (<>
-                      <Icon icon="lucide:loader-2" className="w-4 h-4 mr-2 animate-spin" />
-                      <span>Loading more...</span>
-                    </>)
-                    : (<>
-                      <Icon icon="lucide:arrow-down" className="w-4 h-4 mr-2" />
-                      <span>Load more</span>
-                    </>)
-                  }
+                  <>
+                    <Icon icon={isLoading ? 'lucide:loader-2' : 'lucide:arrow-down'} className={`${isLoading ? 'animate-spin' : ''} mr-2 w-4 h-4`} />
+                    <span>{isLoading ? 'Loading' : 'Load'} more</span>
+                  </>
                 </NextLink>
               </div>
             </>
