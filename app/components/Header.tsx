@@ -91,7 +91,10 @@ function HeaderCtas({
         prefetch="intent"
         to="/account"
       >
-        <Icon icon="lucide:user" className="w-4 h-4" />
+        <Icon
+          icon={ isLoggedIn ? 'lucide:user-check' : 'lucide:user' }
+          className="w-4 h-4"
+        />
       </NavLink>
       <SearchToggle />
       <CartToggle cart={cart} />
