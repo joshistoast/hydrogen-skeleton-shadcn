@@ -1,10 +1,9 @@
-import type {V2_MetaFunction} from '@shopify/remix-oxygen';
 import {json, type LoaderArgs} from '@shopify/remix-oxygen';
-import {Link, useLoaderData} from '@remix-run/react';
+import { Link, useLoaderData, type V2_MetaFunction } from '@remix-run/react';
 import {Image, Pagination, getPaginationVariables} from '@shopify/hydrogen';
 import type {ArticleItemFragment} from 'storefrontapi.generated';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '~/components/ui/card';
-import { Button, buttonVariants } from '~/components/ui/button';
+import { buttonVariants } from '~/components/ui/button';
 import { Icon } from '@iconify/react';
 
 export const meta: V2_MetaFunction = ({data}) => {

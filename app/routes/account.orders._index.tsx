@@ -1,12 +1,6 @@
-import { Icon } from '@iconify/react';
-import {Link, useLoaderData} from '@remix-run/react';
-import {Money, Pagination, getPaginationVariables} from '@shopify/hydrogen';
-import {
-  json,
-  redirect,
-  type LoaderArgs,
-  type V2_MetaFunction,
-} from '@shopify/remix-oxygen';
+import { Link, useLoaderData, type V2_MetaFunction } from '@remix-run/react';
+import { Money, Pagination, getPaginationVariables } from '@shopify/hydrogen';
+import { json, redirect, type LoaderArgs } from '@shopify/remix-oxygen';
 import type {
   CustomerOrdersFragment,
   OrderItemFragment,
@@ -14,6 +8,7 @@ import type {
 import { Badge } from '~/components/ui/badge';
 import { buttonVariants } from '~/components/ui/button';
 import { Card, CardFooter, CardHeader, CardTitle } from '~/components/ui/card';
+import { Icon } from '@iconify/react';
 
 export const meta: V2_MetaFunction = () => {
   return [{title: 'Orders'}];

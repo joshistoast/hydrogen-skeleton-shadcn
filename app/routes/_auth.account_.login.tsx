@@ -3,9 +3,13 @@ import {
   redirect,
   type ActionArgs,
   type LoaderArgs,
-  type V2_MetaFunction,
 } from '@shopify/remix-oxygen';
-import {Form, Link, useActionData} from '@remix-run/react';
+import {
+  Form,
+  Link,
+  useActionData,
+  type V2_MetaFunction,
+} from '@remix-run/react';
 import { Label } from '~/components/ui/label'
 import { Input } from '~/components/ui/input';
 import { Button, buttonVariants } from '~/components/ui/button';

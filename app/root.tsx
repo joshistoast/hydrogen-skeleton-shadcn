@@ -13,7 +13,7 @@ import {
   type ShouldRevalidateFunction,
   Link,
 } from '@remix-run/react'
-import type { CustomerAccessToken } from '@shopify/hydrogen-react/storefront-api-types'
+import type { CustomerAccessToken } from '@shopify/hydrogen/storefront-api-types'
 import type { HydrogenSession } from '../server'
 import favicon from '../public/favicon.svg'
 import appStyles from './styles/app.css'

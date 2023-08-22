@@ -79,7 +79,7 @@ export async function loader({request, context}: LoaderArgs) {
   }
 }
 
-export default function Acccount() {
+export default function Account() {
   const {customer, isPrivateRoute, isAccountHome} =
     useLoaderData<typeof loader>();
 
@@ -118,7 +118,7 @@ function AccountLayout({
       </AccountMenuAside>
       <div className="flex gap-6">
         <div className="hidden w-full max-w-xs shrink-0 lg:block">
-          <AcccountMenu />
+          <AccountMenu />
         </div>
         <div className="flex-1 w-full">
           {children}
@@ -141,7 +141,7 @@ function AccountMenuAside({children, heading}: {children: React.ReactNode, headi
           <SheetTitle>{heading}</SheetTitle>
         </SheetHeader>
 
-        <AcccountMenu onNavLinkClick={() => setMobileAccountMenuOpen(false)} />
+        <AccountMenu onNavLinkClick={() => setMobileAccountMenuOpen(false)} />
 
       </SheetContent>
     </Sheet>
@@ -153,10 +153,10 @@ type AccountMenuItem = {
   to: string;
   label: string;
 }
-type AcccountMenuProps = {
+type AccountMenuProps = {
   onNavLinkClick?: () => void;
 }
-function AcccountMenu({onNavLinkClick}: AcccountMenuProps) {
+function AccountMenu({onNavLinkClick}: AccountMenuProps) {
   const menu: AccountMenuItem[] = [
     {
       icon: 'lucide:box',
