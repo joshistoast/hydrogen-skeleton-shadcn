@@ -6,6 +6,7 @@ import {
   Scripts,
   useMatches,
   useRouteError,
+  LiveReload,
   useLoaderData,
   ScrollRestoration,
   isRouteErrorResponse,
@@ -118,6 +119,7 @@ export default function App() {
         </ThemeProvider>
         <ScrollRestoration />
         <Scripts />
+        <LiveReload />
       </body>
     </html>
   )
@@ -164,6 +166,7 @@ export function ErrorBoundary() {
         </ThemeProvider>
         <ScrollRestoration />
         <Scripts />
+        <LiveReload />
       </body>
     </html>
   )
