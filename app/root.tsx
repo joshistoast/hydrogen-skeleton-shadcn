@@ -1,4 +1,4 @@
-import { defer, type LoaderArgs } from '@shopify/remix-oxygen';
+import { defer, type LoaderArgs } from '@shopify/remix-oxygen'
 import {
   Links,
   Meta,
@@ -9,17 +9,37 @@ import {
   useLoaderData,
   ScrollRestoration,
   isRouteErrorResponse,
+  type ShouldRevalidateFunction,
   Link,
-} from '@remix-run/react';
-import type { CustomerAccessToken } from '@shopify/hydrogen-react/storefront-api-types';
-import type { HydrogenSession } from '../server';
-import favicon from '../public/favicon.svg';
-import appStyles from './styles/app.css';
-import { Layout } from '~/components/Layout';
-import tailwindCss from './styles/tailwind.css';
-import { ThemeProvider } from '~/components/ThemeContext';
-import { buttonVariants } from './components/ui/button';
-import { Icon } from '@iconify/react';
+} from '@remix-run/react'
+import type { CustomerAccessToken } from '@shopify/hydrogen-react/storefront-api-types'
+import type { HydrogenSession } from '../server'
+import favicon from '../public/favicon.svg'
+import appStyles from './styles/app.css'
+import { Layout } from '~/components/Layout'
+import tailwindCss from './styles/tailwind.css'
+import { ThemeProvider } from '~/components/ThemeContext'
+import { buttonVariants } from './components/ui/button'
+import { Icon } from '@iconify/react'
+
+// This is important to avoid re-fetching root queries on sub-navigations
+export const shouldRevalidate: ShouldRevalidateFunction = ({
+  formMethod,
+  currentUrl,
+  nextUrl,
+}) => {
+  // revalidate when a mutation is performed e.g add to cart, login...
+  if (formMethod && formMethod !== 'GET') {
+    return true
+  }
+
+  // revalidate when manually revalidating via useRevalidator
+  if (currentUrl.toString() === nextUrl.toString()) {
+    return true
+  }
+
+  return false
+}
 
 export function links() {
   return [
@@ -34,22 +54,22 @@ export function links() {
       href: 'https://shop.app',
     },
     {rel: 'icon', type: 'image/svg+xml', href: favicon},
-  ];
+  ]
 }
 
 export async function loader({context}: LoaderArgs) {
-  const {storefront, session, cart} = context;
-  const customerAccessToken = await session.get('customerAccessToken');
-  const publicStoreDomain = context.env.PUBLIC_STORE_DOMAIN;
+  const {storefront, session, cart} = context
+  const customerAccessToken = await session.get('customerAccessToken')
+  const publicStoreDomain = context.env.PUBLIC_STORE_DOMAIN
 
   // validate the customer access token is valid
   const {isLoggedIn, headers} = await validateCustomerAccessToken(
     customerAccessToken,
     session,
-  );
+  )
 
   // defer the cart query by not awaiting it
-  const cartPromise = cart.get();
+  const cartPromise = cart.get()
 
   // defer the footer query (below the fold)
   const footerPromise = storefront.query(FOOTER_QUERY, {
@@ -57,7 +77,7 @@ export async function loader({context}: LoaderArgs) {
     variables: {
       footerMenuHandle: 'footer', // Adjust to your footer menu handle
     },
-  });
+  })
 
   // await the header query (above the fold)
   const headerPromise = storefront.query(HEADER_QUERY, {
@@ -65,7 +85,7 @@ export async function loader({context}: LoaderArgs) {
     variables: {
       headerMenuHandle: 'main-menu', // Adjust to your header menu handle
     },
-  });
+  })
 
   return defer(
     {
@@ -76,11 +96,11 @@ export async function loader({context}: LoaderArgs) {
       publicStoreDomain,
     },
     {headers},
-  );
+  )
 }
 
 export default function App() {
-  const data = useLoaderData<typeof loader>();
+  const data = useLoaderData<typeof loader>()
 
   return (
     <html lang="en">
@@ -100,20 +120,20 @@ export default function App() {
         <Scripts />
       </body>
     </html>
-  );
+  )
 }
 
 export function ErrorBoundary() {
-  const error = useRouteError();
-  const [root] = useMatches();
-  let errorMessage = 'Unknown error';
-  let errorStatus = 500;
+  const error = useRouteError()
+  const [root] = useMatches()
+  let errorMessage = 'Unknown error'
+  let errorStatus = 500
 
   if (isRouteErrorResponse(error)) {
-    errorMessage = error?.data?.message ?? error.data;
-    errorStatus = error.status;
+    errorMessage = error?.data?.message ?? error.data
+    errorStatus = error.status
   } else if (error instanceof Error) {
-    errorMessage = error.message;
+    errorMessage = error.message
   }
 
   return (
@@ -146,7 +166,7 @@ export function ErrorBoundary() {
         <Scripts />
       </body>
     </html>
-  );
+  )
 }
 
 /**
@@ -159,29 +179,29 @@ export function ErrorBoundary() {
  * const {isLoggedIn, headers} = await validateCustomerAccessToken(
  *  customerAccessToken,
  *  session,
- *  );
+ *  )
  *  ```
  *  */
 async function validateCustomerAccessToken(
   customerAccessToken: CustomerAccessToken,
   session: HydrogenSession,
 ) {
-  let isLoggedIn = false;
-  const headers = new Headers();
+  let isLoggedIn = false
+  const headers = new Headers()
   if (!customerAccessToken?.accessToken || !customerAccessToken?.expiresAt) {
-    return {isLoggedIn, headers};
+    return {isLoggedIn, headers}
   }
-  const expiresAt = new Date(customerAccessToken.expiresAt);
-  const dateNow = new Date();
-  const customerAccessTokenExpired = expiresAt < dateNow;
+  const expiresAt = new Date(customerAccessToken.expiresAt)
+  const dateNow = new Date()
+  const customerAccessTokenExpired = expiresAt < dateNow
   if (customerAccessTokenExpired) {
-    session.unset('customerAccessToken');
-    headers.append('Set-Cookie', await session.commit());
+    session.unset('customerAccessToken')
+    headers.append('Set-Cookie', await session.commit())
   } else {
-    isLoggedIn = true;
+    isLoggedIn = true
   }
 
-  return {isLoggedIn, headers};
+  return {isLoggedIn, headers}
 }
 
 const MENU_FRAGMENT = `#graphql
@@ -208,7 +228,7 @@ const MENU_FRAGMENT = `#graphql
       ...ParentMenuItem
     }
   }
-` as const;
+` as const
 
 const HEADER_QUERY = `#graphql
   fragment Shop on Shop {
@@ -239,7 +259,7 @@ const HEADER_QUERY = `#graphql
     }
   }
   ${MENU_FRAGMENT}
-` as const;
+` as const
 
 const FOOTER_QUERY = `#graphql
   query Footer(
@@ -252,4 +272,4 @@ const FOOTER_QUERY = `#graphql
     }
   }
   ${MENU_FRAGMENT}
-` as const;
+` as const
