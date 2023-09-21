@@ -275,6 +275,7 @@ const COLLECTION_QUERY = `#graphql
           hasPreviousPage
           hasNextPage
           hasNextPage
+          startCursor
           endCursor
         }
       }

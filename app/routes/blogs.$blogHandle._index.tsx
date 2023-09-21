@@ -169,9 +169,9 @@ const BLOGS_QUERY = `#graphql
           hasPreviousPage
           hasNextPage
           hasNextPage
+          startCursor
           endCursor
         }
-
       }
     }
   }
