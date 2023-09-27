@@ -42,7 +42,8 @@ function FeaturedCollection({
 }: {
   collection: FeaturedCollectionFragment;
 }) {
-  const image = collection.image;
+  if (!collection) return null;
+  const image = collection?.image;
   return (
     <Link
       className="featured-collection"
