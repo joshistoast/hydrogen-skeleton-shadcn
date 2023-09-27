@@ -177,14 +177,13 @@ export function ErrorBoundary() {
  * @see https://shopify.dev/docs/api/storefront/latest/objects/CustomerAccessToken
  *
  * @example
- * ```ts
- * //
+ * ```js
  * const {isLoggedIn, headers} = await validateCustomerAccessToken(
  *  customerAccessToken,
  *  session,
- *  )
- *  ```
- *  */
+ * );
+ * ```
+ */
 async function validateCustomerAccessToken(
   session: HydrogenSession,
   customerAccessToken?: CustomerAccessToken,
