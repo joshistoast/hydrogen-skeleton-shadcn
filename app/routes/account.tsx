@@ -4,7 +4,7 @@ import {json, redirect, type LoaderArgs} from '@shopify/remix-oxygen';
 import React from 'react';
 import type {CustomerFragment} from 'storefrontapi.generated';
 import { Button, buttonVariants } from '~/components/ui/button';
-import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '~/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '~/components/ui/sheet';
 
 export function shouldRevalidate() {
   return true;

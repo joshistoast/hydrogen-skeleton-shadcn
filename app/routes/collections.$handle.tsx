@@ -5,7 +5,6 @@ import {
   getPaginationVariables,
   Image,
   Money,
-  flattenConnection,
 } from '@shopify/hydrogen';
 import type {
   Filter,

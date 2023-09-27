@@ -2,7 +2,7 @@ import {json, type LoaderArgs} from '@shopify/remix-oxygen';
 import { Link, useLoaderData, type V2_MetaFunction } from '@remix-run/react';
 import {Image, Pagination, getPaginationVariables} from '@shopify/hydrogen';
 import type {ArticleItemFragment} from 'storefrontapi.generated';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '~/components/ui/card';
+import { Card, CardContent, CardFooter } from '~/components/ui/card';
 import { buttonVariants } from '~/components/ui/button';
 import { Icon } from '@iconify/react';
 
